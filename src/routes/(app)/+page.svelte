@@ -348,32 +348,21 @@
 				</div>
 			</div>
 		{:else}
-			<div class="sessions-status-columns">
-				{#each allStatusGroups as group (group.id)}
-					<div class="status-column" class:empty={group.sessions.length === 0}>
-						<div class="status-header {group.type}">
-							<span class="status-indicator {group.type}"></span>
-							<span class="status-title">{group.label}</span>
-							<span class="status-count">{group.sessions.length}</span>
-						</div>
-						<div class="sessions-card-list">
-							{#each group.sessions as session (session.id)}
-								<div
-									class="card-wrapper"
-									transition:slide={{ duration: 400, easing: quintOut }}
-									animate:flip={{ duration: 400 }}
-								>
-									<SessionCard
-										{session}
-										compact={false}
-										onexpand={() => handleExpand(session)}
-										onstop={() => handleStop(session.pid)}
-										onopen={() => handleOpen(session.pid, session.projectPath)}
-										onrename={() => showRenameHint = true}
-									/>
-								</div>
-							{/each}
-						</div>
+			<div class="sessions-grid">
+				{#each sessions as session (session.id)}
+					<div
+						class="card-wrapper"
+						transition:slide={{ duration: 400, easing: quintOut }}
+						animate:flip={{ duration: 400 }}
+					>
+						<SessionCard
+							{session}
+							compact={false}
+							onexpand={() => handleExpand(session)}
+							onstop={() => handleStop(session.pid)}
+							onopen={() => handleOpen(session.pid, session.projectPath)}
+							onrename={() => showRenameHint = true}
+						/>
 					</div>
 				{/each}
 			</div>
@@ -1294,7 +1283,7 @@
 		background: var(--text-secondary);
 		border-color: var(--text-secondary);
 	}
-	/* Sessions Tab - Status Columns Layout */
+	/* Sessions Tab - Grid Layout */
 	.sessions-main {
 		display: flex;
 		flex-direction: column;
@@ -1302,43 +1291,20 @@
 		overflow: hidden;
 	}
 
-	.sessions-status-columns {
+	.sessions-grid {
 		display: flex;
 		flex-direction: row;
-		gap: var(--space-xl);
-		padding: var(--space-lg) 0;
-		height: 100%;
-		overflow-x: auto;
-	}
-
-	.status-column {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-		min-width: 380px;
-		max-width: 420px;
-		flex: 1;
-	}
-
-	.status-column.empty {
-		opacity: 0.5;
-	}
-
-	.status-column.empty .status-header {
-		background: transparent;
-		border-left-style: dashed;
-	}
-
-	.sessions-card-list {
-		display: flex;
-		flex-direction: column;
+		flex-wrap: wrap;
 		gap: var(--space-lg);
+		padding: var(--space-lg);
 		overflow-y: auto;
-		padding-right: var(--space-sm);
+		justify-content: flex-start;
+		align-items: flex-start;
 	}
 
-	.sessions-card-list .card-wrapper {
-		width: 100%;
+	.sessions-grid .card-wrapper {
+		width: 340px;
+		flex-shrink: 0;
 	}
 
 </style>

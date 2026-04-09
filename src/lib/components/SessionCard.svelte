@@ -140,6 +140,12 @@
 	role="button"
 	tabindex="0"
 >
+	<!-- Status Header Bar -->
+	<div class="status-header-bar">
+		<span class="status-indicator"></span>
+		<span class="status-label">{getStatusLabel()}</span>
+	</div>
+
 	<!-- Card Content -->
 	<div class="card-body">
 		<!-- Header (Summary as Title) -->
@@ -270,17 +276,17 @@
 	.session-card {
 		position: relative;
 		display: flex;
-		gap: var(--space-lg);
-		padding: var(--space-lg);
+		flex-direction: column;
 		background: var(--bg-card);
 		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
 		cursor: pointer;
 		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 		text-align: left;
 		width: 100%;
 		height: 235px;
+		overflow: hidden;
 	}
-
 
 	.session-card:hover {
 		border-color: var(--text-muted);
@@ -295,6 +301,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
+		padding: var(--space-md) var(--space-lg) var(--space-lg);
 	}
 
 	.card-header {
@@ -583,6 +590,58 @@
 		height: 28px;
 		justify-content: center;
 		border-radius: 4px;
+	}
+
+	/* Status Header Bar */
+	.status-header-bar {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		padding: var(--space-xs) var(--space-md);
+		background: var(--bg-elevated);
+		border-bottom: 1px solid var(--border-default);
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+	}
+
+	.status-header-bar .status-indicator {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--text-muted);
+	}
+
+	.status-header-bar .status-label {
+		font-family: var(--font-mono);
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--text-secondary);
+	}
+
+	/* Status-specific colors for header bar */
+	.session-card.attention .status-header-bar .status-indicator {
+		background: var(--status-permission);
+		box-shadow: 0 0 6px var(--status-permission);
+	}
+
+	.session-card.permission .status-header-bar .status-indicator {
+		background: var(--status-permission);
+		box-shadow: 0 0 6px var(--status-permission);
+	}
+
+	.session-card.waiting .status-header-bar .status-indicator {
+		background: var(--status-input);
+	}
+
+	.session-card.working .status-header-bar .status-indicator {
+		background: var(--status-working);
+		animation: pulse-indicator 2s ease-in-out infinite;
+	}
+
+	@keyframes pulse-indicator {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
 	}
 
 	/* ── Mobile Responsive ─────────────────────────────────────── */
