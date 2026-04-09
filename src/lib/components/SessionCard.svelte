@@ -21,6 +21,7 @@
 	let isPermission = $derived(session.status === SessionStatus.NeedsAttention);
 	let isWaitingInput = $derived(session.status === SessionStatus.WaitingForInput);
 	let isWorking = $derived(session.status === SessionStatus.Working);
+	let isConnecting = $derived(session.status === SessionStatus.Connecting);
 
 	let tooltipText = $state('');
 	let tooltipX = $state(0);
@@ -135,6 +136,7 @@
 	class:permission={isPermission}
 	class:waiting={isWaitingInput}
 	class:working={isWorking}
+	class:connecting={isConnecting}
 	onclick={handleCardClick}
 	onkeydown={handleCardKeydown}
 	role="button"
@@ -636,6 +638,10 @@
 		border-left-color: var(--status-working);
 	}
 
+	.session-card.connecting .status-header-bar {
+		border-left-color: var(--status-connecting);
+	}
+
 	.session-card.attention .status-header-bar .status-indicator {
 		background: var(--status-permission);
 		box-shadow: 0 0 6px var(--status-permission);
@@ -652,6 +658,11 @@
 
 	.session-card.working .status-header-bar .status-indicator {
 		background: var(--status-working);
+		animation: pulse-indicator 2s ease-in-out infinite;
+	}
+
+	.session-card.connecting .status-header-bar .status-indicator {
+		background: var(--status-connecting);
 		animation: pulse-indicator 2s ease-in-out infinite;
 	}
 
