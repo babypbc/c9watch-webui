@@ -33,21 +33,6 @@
 
 	let cardTitle = $derived(session.customTitle || session.summary || session.firstPrompt);
 
-	function getStatusColor(): string {
-		switch (session.status) {
-			case SessionStatus.Working:
-				return 'var(--status-working)';
-			case SessionStatus.NeedsAttention:
-				return 'var(--status-permission)';
-			case SessionStatus.WaitingForInput:
-				return 'var(--status-input)';
-			case SessionStatus.Connecting:
-				return 'var(--status-working)';
-			default:
-				return 'var(--status-working)';
-		}
-	}
-
 	function getStatusLabel(): string {
 		switch (session.status) {
 			case SessionStatus.Working:
@@ -188,7 +173,7 @@
 		<!-- Project & Stats Row -->
 		<div class="stats-row">
 			<span class="session-name-badge">{session.sessionName}</span>
-			
+
 			{#if !compact}
 				<div class="stats-group">
 					<span class="message-count">
@@ -198,12 +183,6 @@
 						{session.messageCount}
 					</span>
 					<span class="time-badge">{formatTimeSince(session.modified)}</span>
-				</div>
-			{/if}
-			
-			{#if compact}
-				<div class="status-label" style="color: {getStatusColor()}">
-					{getStatusLabel()}
 				</div>
 			{/if}
 		</div>
@@ -222,13 +201,6 @@
 				</div>
 			{/if}
 
-			<!-- Status Label -->
-			<div class="status-label" style="color: {getStatusColor()}">
-				{getStatusLabel()}
-			</div>
-		{/if}
-
-		{#if !compact}
 			<!-- Message Preview -->
 			<p class="task-preview">{session.latestMessage || session.firstPrompt}</p>
 
@@ -423,16 +395,6 @@
 		letter-spacing: 0.05em;
 	}
 
-
-	/* Status Label */
-	.status-label {
-		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-	}
-
 	/* Task Preview */
 	.task-preview {
 		font-size: 21px; /* 14px * 1.5 = 21px */
@@ -553,17 +515,6 @@
 	}
 
 	.session-card.compact .stats-row {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 3px; /* 2px * 1.5 = 3px */
-	}
-
-	.session-card.compact .status-label {
-		font-size: 15px; /* 10px * 1.5 = 15px */
-		margin-top: 0;
-	}
-
-	.session-card.compact .stats-row {
 		justify-content: flex-start;
 		gap: var(--space-md);
 	}
@@ -625,21 +576,36 @@
 	.session-card.attention .status-header-bar {
 		border-left-color: var(--status-permission);
 	}
+	.session-card.attention .status-header-bar .status-label {
+		color: var(--status-permission);
+	}
 
 	.session-card.permission .status-header-bar {
 		border-left-color: var(--status-permission);
+	}
+	.session-card.permission .status-header-bar .status-label {
+		color: var(--status-permission);
 	}
 
 	.session-card.waiting .status-header-bar {
 		border-left-color: var(--status-input);
 	}
+	.session-card.waiting .status-header-bar .status-label {
+		color: var(--status-input);
+	}
 
 	.session-card.working .status-header-bar {
 		border-left-color: var(--status-working);
 	}
+	.session-card.working .status-header-bar .status-label {
+		color: var(--status-working);
+	}
 
 	.session-card.connecting .status-header-bar {
 		border-left-color: var(--status-connecting);
+	}
+	.session-card.connecting .status-header-bar .status-label {
+		color: var(--status-connecting);
 	}
 
 	.session-card.attention .status-header-bar .status-indicator {
