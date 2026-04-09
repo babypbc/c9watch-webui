@@ -129,8 +129,11 @@
 >
 	<!-- Status Header Bar -->
 	<div class="status-header-bar">
-		<span class="status-indicator"></span>
-		<span class="status-label">{getStatusLabel()}</span>
+		<div class="status-header-bar-left">
+			<span class="status-indicator"></span>
+			<span class="status-label">{getStatusLabel()}</span>
+		</div>
+		<span class="project-name-badge">{session.sessionName}</span>
 	</div>
 
 	<!-- Card Content -->
@@ -172,8 +175,6 @@
 
 		<!-- Project & Stats Row -->
 		<div class="stats-row">
-			<span class="session-name-badge">{session.sessionName}</span>
-
 			{#if !compact}
 				<div class="stats-group">
 					<span class="message-count">
@@ -345,24 +346,6 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 	}
 
-	.session-name-badge {
-		font-family: var(--font-mono);
-		font-size: 16.5px; /* 11px * 1.5 = 16.5px */
-		font-weight: 500;
-		color: var(--text-muted);
-		background: var(--bg-elevated);
-		padding: 3px 9px; /* 2px 6px * 1.5 */
-		border: 1px solid var(--border-default);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		display: inline-block;
-		vertical-align: middle;
-		max-width: 100%;
-	}
-
 	.git-branch {
 		display: flex;
 		align-items: center;
@@ -497,10 +480,6 @@
 		align-items: center;
 	}
 
-	.session-card.compact .session-name-badge {
-		max-width: 150px;
-	}
-
 	.session-card.compact .card-body {
 		gap: 4px;
 		justify-content: center;
@@ -549,11 +528,18 @@
 	.status-header-bar {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: var(--space-sm);
 		padding: var(--space-sm) var(--space-md);
 		background: rgba(255, 255, 255, 0.03);
 		border-left: 3px solid var(--border-default);
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+	}
+
+	.status-header-bar-left {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
 	}
 
 	.status-header-bar .status-indicator {
@@ -570,6 +556,19 @@
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
 		color: var(--text-secondary);
+	}
+
+	.project-name-badge {
+		font-family: var(--font-mono);
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-muted);
+		background: var(--bg-elevated);
+		padding: 2px 8px;
+		border: 1px solid var(--border-default);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin-left: auto;
 	}
 
 	/* Status-specific colors for header bar - matches MONITOR page */
@@ -652,10 +651,6 @@
 		.stats-row {
 			flex-wrap: wrap;
 			gap: var(--space-xs);
-		}
-
-		.session-name-badge {
-			max-width: 60%;
 		}
 
 		.branch-name {
