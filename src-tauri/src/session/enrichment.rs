@@ -113,7 +113,8 @@ pub fn detect_and_enrich_sessions_with_detector(
         seen_ids.insert(session_id.clone());
 
         // Try to parse sessions-index.json to get basic info (optional)
-        let index_path = detected.project_path.join("sessions-index.json");
+        // sessions-index.json is in the actual project's .claude/ directory
+        let index_path = detected.cwd.join(".claude").join("sessions-index.json");
         let sessions_index = parse_sessions_index(&index_path).ok();
 
         // Find the matching entry in the index (if index exists)
@@ -135,8 +136,8 @@ pub fn detect_and_enrich_sessions_with_detector(
                 } else {
                     entry.first_prompt.clone()
                 };
-                // Get git status from the project directory (sessions-index doesn't track it)
-                let git_status = get_git_status_summary(&detected.project_path);
+                // Get git status from the actual project directory (sessions-index doesn't track it)
+                let git_status = get_git_status_summary(&detected.cwd);
                 (
                     fp,
                     entry.summary.clone(),
@@ -168,9 +169,13 @@ pub fn detect_and_enrich_sessions_with_detector(
                     })
                     .unwrap_or_default();
 
-                // Get git branch and status from the project directory
-                let git_branch = get_git_branch(&detected.project_path);
-                let git_status = get_git_status_summary(&detected.project_path);
+                // Get git branch and status from the actual project directory (detected.cwd)
+                crate::debug_log::log_info(&format!(
+                    "Session {}: fetching git info from cwd={:?}",
+                    session_id, detected.cwd
+                ));
+                let git_branch = get_git_branch(&detected.cwd);
+                let git_status = get_git_status_summary(&detected.cwd);
 
                 (first_prompt, None, message_count, modified, git_branch, git_status)
             }
