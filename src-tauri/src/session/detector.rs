@@ -196,6 +196,28 @@ impl SessionDetector {
         // Sort by modification time (most recent first)
         session_files.sort_by(|a, b| b.0.cmp(&a.0));
 
+        // Log all session files found for debugging
+        crate::debug_log::log_info(&format!(
+            "Found {} session files: {:?}",
+            session_files.len(),
+            session_files
+                .iter()
+                .map(|(mtime, path, _, _, pname, reliable)| {
+                    let mtime_secs = mtime
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .map(|d| d.as_secs())
+                        .unwrap_or(0);
+                    format!(
+                        "{} ({}s, project={}, reliable={})",
+                        path.file_stem().unwrap_or_default().to_string_lossy(),
+                        mtime_secs,
+                        pname,
+                        reliable
+                    )
+                })
+                .collect::<Vec<_>>()
+        ));
+
         // Process-centric approach: for each process, find its matching session
         // This ensures we only show sessions that have actual running processes
         let mut sessions = Vec::new();
