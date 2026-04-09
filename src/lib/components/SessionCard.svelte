@@ -592,14 +592,14 @@
 		border-radius: 4px;
 	}
 
-	/* Status Header Bar */
+	/* Status Header Bar - matches MONITOR page status-header style */
 	.status-header-bar {
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
-		padding: var(--space-xs) var(--space-md);
-		background: var(--bg-elevated);
-		border-bottom: 1px solid var(--border-default);
+		padding: var(--space-sm) var(--space-md);
+		background: rgba(255, 255, 255, 0.03);
+		border-left: 3px solid var(--border-default);
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 	}
 
@@ -612,14 +612,30 @@
 
 	.status-header-bar .status-label {
 		font-family: var(--font-mono);
-		font-size: 10px;
-		font-weight: 600;
+		font-size: 12px;
+		font-weight: 500;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
 		color: var(--text-secondary);
 	}
 
-	/* Status-specific colors for header bar */
+	/* Status-specific colors for header bar - matches MONITOR page */
+	.session-card.attention .status-header-bar {
+		border-left-color: var(--status-permission);
+	}
+
+	.session-card.permission .status-header-bar {
+		border-left-color: var(--status-permission);
+	}
+
+	.session-card.waiting .status-header-bar {
+		border-left-color: var(--status-input);
+	}
+
+	.session-card.working .status-header-bar {
+		border-left-color: var(--status-working);
+	}
+
 	.session-card.attention .status-header-bar .status-indicator {
 		background: var(--status-permission);
 		box-shadow: 0 0 6px var(--status-permission);
