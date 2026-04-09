@@ -274,13 +274,15 @@ impl SessionDetector {
                             "PID={}: session_id={} from pid.json not found in session_files, using fallback",
                             proc.pid, meta.session_id
                         ));
-                        // Fallback: find any available session file in the same project directory
+                        // Fallback: find any available session file by matching the project directory name
                         // This handles the case where Claude created a new session (via /clear)
                         // but the pid.json still references the old session ID
-                        // We match by checking if any session's project_path contains the proc_cwd
+                        // Match by finding a session whose project_dir (the ~/.claude/projects/-xxx/ dir)
+                        // was created for the same project path
+                        let target_project_dir = self.claude_projects_dir.join(&encode_path_for_matching(&proc_cwd.to_string_lossy()));
                         if let Some((_, path, project_dir, _, project_name, _)) =
-                            session_files.iter().find(|(_, _, _, project_path, _, _)| {
-                                proc_cwd.starts_with(project_path) || proc_cwd.as_os_str() == project_path.as_os_str()
+                            session_files.iter().find(|(_, _, proj_dir, _, _, _)| {
+                                *proj_dir == target_project_dir
                             })
                         {
                             if let Some(session_id) = path.file_stem().and_then(|s| s.to_str()) {
@@ -294,7 +296,7 @@ impl SessionDetector {
                                     sessions.push(DetectedSession {
                                         pid: proc.pid,
                                         cwd: proc_cwd.clone(),
-                                        project_path: project_dir.clone(),
+                                        project_path: proc_cwd.clone(),
                                         session_id: Some(session_id.to_string()),
                                         project_name: project_name.clone(),
                                     });
