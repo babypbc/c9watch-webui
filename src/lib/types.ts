@@ -34,6 +34,9 @@ export interface Session {
   /** Git branch name (if available) */
   gitBranch: string | null;
 
+  /** Git status summary showing changed files count (+N -M) */
+  gitStatus: string | null;
+
   /** Summary of the first prompt (shown in list view) */
   firstPrompt: string;
 

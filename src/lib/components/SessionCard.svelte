@@ -202,16 +202,23 @@
 		</div>
 
 		{#if !compact}
-			<!-- Git Branch -->
-			{#if session.gitBranch}
-				<div class="git-branch">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<line x1="6" y1="3" x2="6" y2="15" />
-						<circle cx="18" cy="6" r="3" />
-						<circle cx="6" cy="18" r="3" />
-						<path d="M18 9a9 9 0 0 1-9 9" />
-					</svg>
-					<span class="branch-name">{session.gitBranch}</span>
+			<!-- Git Branch & Status -->
+			{#if session.gitBranch || session.gitStatus}
+				<div class="git-info">
+					{#if session.gitBranch}
+						<div class="git-branch">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="6" y1="3" x2="6" y2="15" />
+								<circle cx="18" cy="6" r="3" />
+								<circle cx="6" cy="18" r="3" />
+								<path d="M18 9a9 9 0 0 1-9 9" />
+							</svg>
+							<span class="branch-name">{session.gitBranch}</span>
+						</div>
+					{/if}
+					{#if session.gitStatus}
+						<span class="git-status">{session.gitStatus}</span>
+					{/if}
 				</div>
 			{/if}
 
@@ -388,6 +395,22 @@
 		text-overflow: ellipsis;
 		min-width: 0;
 		max-width: 300px; /* 200px * 1.5 = 300px */
+	}
+
+	.git-info {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-sm);
+	}
+
+	.git-status {
+		font-family: var(--font-mono);
+		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-weight: 500;
+		color: var(--text-muted);
+		letter-spacing: 0.05em;
+		white-space: nowrap;
 	}
 
 	.time-badge {

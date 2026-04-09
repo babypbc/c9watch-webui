@@ -24,8 +24,6 @@ use actions::{open_session as open_session_action, stop_session as stop_session_
 #[cfg(feature = "gui")]
 use polling::{detect_and_enrich_sessions, start_polling, Session};
 #[cfg(feature = "gui")]
-use serde::Serialize;
-#[cfg(feature = "gui")]
 use session::conversation::Conversation;
 // Re-export for web_server.rs which uses crate::get_conversation_data
 #[cfg(feature = "gui")]

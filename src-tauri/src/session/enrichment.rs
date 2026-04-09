@@ -20,6 +20,7 @@ pub struct Session {
     pub custom_title: Option<String>,
     pub project_path: String,
     pub git_branch: Option<String>,
+    pub git_status: Option<String>,
     pub first_prompt: String,
     pub summary: Option<String>,
     pub message_count: u32,
@@ -123,7 +124,7 @@ pub fn detect_and_enrich_sessions_with_detector(
                 .find(|entry| entry.session_id == session_id)
         });
 
-        let (first_prompt, summary, message_count, modified, git_branch) = match session_entry {
+        let (first_prompt, summary, message_count, modified, git_branch, git_status) = match session_entry {
             Some(entry) => {
                 // Guard: if sessions-index first_prompt is a system command, try JSONL fallback
                 let fp = if crate::session::parser::is_system_content(&entry.first_prompt) {
@@ -140,6 +141,7 @@ pub fn detect_and_enrich_sessions_with_detector(
                     entry.message_count,
                     entry.modified.clone(),
                     Some(entry.git_branch.clone()),
+                    None, // sessions-index doesn't track git status
                 )
             }
             None => {
@@ -164,7 +166,11 @@ pub fn detect_and_enrich_sessions_with_detector(
                     })
                     .unwrap_or_default();
 
-                (first_prompt, None, message_count, modified, None)
+                // Get git branch and status from the project directory
+                let git_branch = get_git_branch(&detected.project_path);
+                let git_status = get_git_status_summary(&detected.project_path);
+
+                (first_prompt, None, message_count, modified, git_branch, git_status)
             }
         };
 
@@ -227,6 +233,7 @@ pub fn detect_and_enrich_sessions_with_detector(
             custom_title,
             project_path: detected.cwd.to_string_lossy().to_string(),
             git_branch,
+            git_status,
             first_prompt,
             summary,
             message_count,
@@ -253,6 +260,71 @@ pub fn is_file_recently_modified(path: &Path, seconds: u64) -> bool {
                 .unwrap_or(false)
         })
         .unwrap_or(false)
+}
+
+/// Get the current git branch name for a directory
+pub fn get_git_branch(project_path: &Path) -> Option<String> {
+    std::process::Command::new("git")
+        .arg("branch")
+        .arg("--show-current")
+        .current_dir(project_path)
+        .output()
+        .ok()
+        .and_then(|output| {
+            if output.status.success() {
+                String::from_utf8_lossy(&output.stdout)
+                    .trim()
+                    .to_string()
+                    .into()
+            } else {
+                None
+            }
+        })
+}
+
+/// Get git status summary as "+N -M" (added/modified lines) for a directory
+pub fn get_git_status_summary(project_path: &Path) -> Option<String> {
+    std::process::Command::new("git")
+        .arg("status")
+        .arg("--porcelain")
+        .current_dir(project_path)
+        .output()
+        .ok()
+        .and_then(|output| {
+            if output.status.success() {
+                let status = String::from_utf8_lossy(&output.stdout);
+                if status.trim().is_empty() {
+                    return None;
+                }
+
+                let mut additions = 0u32;
+                let mut deletions = 0u32;
+
+                for line in status.lines() {
+                    if line.len() >= 2 {
+                        let x = line.as_bytes()[0] as char;
+                        let y = line.as_bytes()[1] as char;
+
+                        // Count added lines (first column: A, M, D, R, C, etc.)
+                        if x == 'A' || x == 'M' || x == 'R' || x == 'C' {
+                            additions += 1;
+                        }
+                        // Count deleted lines
+                        if x == 'D' || y == 'D' {
+                            deletions += 1;
+                        }
+                    }
+                }
+
+                if additions > 0 || deletions > 0 {
+                    Some(format!("+{} -{}", additions, deletions))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
 }
 
 /// Extract the first user prompt from a session JSONL file (truncated to 100 chars).
