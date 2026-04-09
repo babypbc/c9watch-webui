@@ -13,6 +13,12 @@
 
 	let { session, compact = false, onexpand, onstop, onopen, onrename }: Props = $props();
 
+	// Extract project directory name from projectPath
+	let projectName = $derived(() => {
+		const parts = session.projectPath.split(/[/\\]/).filter(p => p);
+		return parts.pop() || session.projectPath;
+	});
+
 	let needsAttention = $derived(
 		session.status === SessionStatus.NeedsAttention ||
 			session.status === SessionStatus.WaitingForInput
@@ -133,7 +139,7 @@
 			<span class="status-indicator"></span>
 			<span class="status-label">{getStatusLabel()}</span>
 		</div>
-		<span class="project-name-badge">{session.sessionName}</span>
+		<span class="project-name-badge">{projectName}</span>
 	</div>
 
 	<!-- Card Content -->
@@ -566,8 +572,7 @@
 		background: var(--bg-elevated);
 		padding: 2px 8px;
 		border: 1px solid var(--border-default);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: 0.05em;
 		margin-left: auto;
 	}
 
