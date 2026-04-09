@@ -823,9 +823,9 @@
 	.status-group {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md);
-		min-width: 350px;
-		max-width: 400px;
+		gap: var(--space-lg); /* Increased from space-md */
+		min-width: 525px; /* 350px * 1.5 = 525px */
+		max-width: 600px; /* 400px * 1.5 = 600px */
 		flex: 1;
 	}
 
@@ -1028,13 +1028,13 @@
 
 	.all-sessions-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-		gap: var(--space-lg);
+		grid-template-columns: repeat(auto-fill, minmax(525px, 1fr)); /* 350px * 1.5 = 525px */
+		gap: var(--space-xl); /* Increased from space-lg */
 	}
 
 	.all-sessions-grid.compact {
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: var(--space-md);
+		grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); /* 280px * 1.5 = 420px */
+		gap: var(--space-lg);
 	}
 
 	.toggle-divider {
@@ -1295,7 +1295,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: var(--space-lg);
+		gap: var(--space-xl); /* Increased from space-lg */
 		padding: var(--space-lg);
 		overflow-y: auto;
 		justify-content: flex-start;
@@ -1303,7 +1303,7 @@
 	}
 
 	.sessions-grid .card-wrapper {
-		width: 340px;
+		width: 510px; /* 340px * 1.5 = 510px */
 		flex-shrink: 0;
 	}
 

@@ -286,7 +286,7 @@
 		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 		text-align: left;
 		width: 100%;
-		height: 235px;
+		height: 352px; /* 235px * 1.5 = 352.5px */
 		overflow: hidden;
 	}
 
@@ -314,7 +314,7 @@
 
 	.card-main-title {
 		font-family: var(--font-sans);
-		font-size: 15px;
+		font-size: 22.5px; /* 15px * 1.5 = 22.5px */
 		font-weight: 600;
 		color: var(--text-primary);
 		margin: 0;
@@ -359,11 +359,11 @@
 	.id-tooltip {
 		position: fixed;
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: 16.5px; /* 11px * 1.5 = 16.5px */
 		color: var(--text-primary);
 		background: var(--bg-elevated);
 		border: 1px solid var(--border-default);
-		padding: 4px 8px;
+		padding: 6px 12px; /* 4px 8px * 1.5 = 6px 12px */
 		white-space: nowrap;
 		pointer-events: none;
 		z-index: 9999;
@@ -375,11 +375,11 @@
 
 	.session-name-badge {
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: 16.5px; /* 11px * 1.5 = 16.5px */
 		font-weight: 500;
 		color: var(--text-muted);
 		background: var(--bg-elevated);
-		padding: 2px 6px;
+		padding: 3px 9px; /* 2px 6px * 1.5 */
 		border: 1px solid var(--border-default);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
@@ -394,9 +394,9 @@
 	.git-branch {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 6px; /* 4px * 1.5 = 6px */
 		font-family: var(--font-mono);
-		font-size: 12px;
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		color: var(--text-muted);
 		text-transform: lowercase;
 		min-width: 0;
@@ -411,12 +411,12 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		min-width: 0;
-		max-width: 200px;
+		max-width: 300px; /* 200px * 1.5 = 300px */
 	}
 
 	.time-badge {
 		font-family: var(--font-mono);
-		font-size: 12px;
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		font-weight: 500;
 		color: var(--text-muted);
 		text-transform: uppercase;
@@ -427,7 +427,7 @@
 	/* Status Label */
 	.status-label {
 		font-family: var(--font-mono);
-		font-size: 12px;
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		font-weight: 500;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
@@ -435,7 +435,7 @@
 
 	/* Task Preview */
 	.task-preview {
-		font-size: 14px;
+		font-size: 21px; /* 14px * 1.5 = 21px */
 		color: var(--text-secondary);
 		line-height: 1.5;
 		display: -webkit-box;
@@ -449,9 +449,9 @@
 	.message-count {
 		display: inline-flex;
 		align-items: center;
-		gap: 4px;
+		gap: 6px; /* 4px * 1.5 = 6px */
 		font-family: var(--font-mono);
-		font-size: 12px;
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		color: var(--text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -486,13 +486,13 @@
 	.action-btn {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 4px 8px;
+		gap: 9px; /* 6px * 1.5 = 9px */
+		padding: 6px 12px; /* 4px 8px * 1.5 = 6px 12px */
 		background: var(--bg-base);
 		border: 1px solid var(--border-default);
 		color: var(--text-muted);
 		font-family: var(--font-mono);
-		font-size: 10px;
+		font-size: 15px; /* 10px * 1.5 = 15px */
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
@@ -546,7 +546,7 @@
 	}
 
 	.session-card.compact .card-main-title {
-		font-size: 13px;
+		font-size: 19.5px; /* 13px * 1.5 = 19.5px */
 		-webkit-line-clamp: 1;
 		line-clamp: 1;
 		margin-bottom: 2px;
@@ -555,11 +555,11 @@
 	.session-card.compact .stats-row {
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 2px;
+		gap: 3px; /* 2px * 1.5 = 3px */
 	}
 
 	.session-card.compact .status-label {
-		font-size: 10px;
+		font-size: 15px; /* 10px * 1.5 = 15px */
 		margin-top: 0;
 	}
 
@@ -606,15 +606,15 @@
 	}
 
 	.status-header-bar .status-indicator {
-		width: 6px;
-		height: 6px;
+		width: 9px; /* 6px * 1.5 = 9px */
+		height: 9px; /* 6px * 1.5 = 9px */
 		border-radius: 50%;
 		background: var(--text-muted);
 	}
 
 	.status-header-bar .status-label {
 		font-family: var(--font-mono);
-		font-size: 12px;
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		font-weight: 500;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
