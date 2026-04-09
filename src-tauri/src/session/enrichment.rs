@@ -135,13 +135,15 @@ pub fn detect_and_enrich_sessions_with_detector(
                 } else {
                     entry.first_prompt.clone()
                 };
+                // Get git status from the project directory (sessions-index doesn't track it)
+                let git_status = get_git_status_summary(&detected.project_path);
                 (
                     fp,
                     entry.summary.clone(),
                     entry.message_count,
                     entry.modified.clone(),
                     Some(entry.git_branch.clone()),
-                    None, // sessions-index doesn't track git status
+                    git_status,
                 )
             }
             None => {
@@ -223,6 +225,10 @@ pub fn detect_and_enrich_sessions_with_detector(
             "Session {}: native_title={:?}, custom_titles={:?}",
             session_id, native_title, custom_titles.get(&session_id)
         ));
+        crate::debug_log::log_info(&format!(
+            "Session {}: git_branch={:?}, git_status={:?}",
+            session_id, git_branch, git_status
+        ));
         let custom_title =
             native_title.or_else(|| custom_titles.get(&session_id).cloned());
 
@@ -282,7 +288,7 @@ pub fn get_git_branch(project_path: &Path) -> Option<String> {
         })
 }
 
-/// Get git status summary as "+N -M" (added/modified lines) for a directory
+/// Get git status summary as "+N -M" (changed/deleted files) for a directory
 pub fn get_git_status_summary(project_path: &Path) -> Option<String> {
     std::process::Command::new("git")
         .arg("status")
@@ -297,27 +303,31 @@ pub fn get_git_status_summary(project_path: &Path) -> Option<String> {
                     return None;
                 }
 
-                let mut additions = 0u32;
-                let mut deletions = 0u32;
+                let mut added = 0u32;
+                let mut deleted = 0u32;
 
                 for line in status.lines() {
                     if line.len() >= 2 {
                         let x = line.as_bytes()[0] as char;
                         let y = line.as_bytes()[1] as char;
 
-                        // Count added lines (first column: A, M, D, R, C, etc.)
-                        if x == 'A' || x == 'M' || x == 'R' || x == 'C' {
-                            additions += 1;
-                        }
-                        // Count deleted lines
-                        if x == 'D' || y == 'D' {
-                            deletions += 1;
+                        // Count based on status codes
+                        match (x, y) {
+                            // Modified, Renamed, Copied, Untracked - count as added
+                            ('M' | 'A' | 'R' | 'C' | '?', _) => added += 1,
+                            // Deleted
+                            ('D', _) => deleted += 1,
+                            // Second column: D means deleted
+                            (_, 'D') => deleted += 1,
+                            // Modified in working tree
+                            (_, 'M') => added += 1,
+                            _ => {}
                         }
                     }
                 }
 
-                if additions > 0 || deletions > 0 {
-                    Some(format!("+{} -{}", additions, deletions))
+                if added > 0 || deleted > 0 {
+                    Some(format!("+{} -{}", added, deleted))
                 } else {
                     None
                 }
