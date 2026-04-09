@@ -43,7 +43,7 @@
 
 	let isCompact = $state(false);
 
-	let activeTab = $state<'monitor' | 'history' | 'cost' | 'memory'>('monitor');
+	let activeTab = $state<'sessions' | 'monitor' | 'history' | 'cost' | 'memory'>('sessions');
 	let fdaLikelyNeeded = $state(false);
 	let showDebugConsole = $state(false);
 	let showRenameHint = $state(false);
@@ -290,6 +290,14 @@
 	<div class="tab-bar" class:fullscreen={isFullscreen} data-tauri-drag-region>
 		<button
 			class="tab-btn"
+			class:active={activeTab === 'sessions'}
+			onclick={() => (activeTab = 'sessions')}
+		>
+			<span class="tab-icon">◉</span>
+			<span class="tab-label">SESSIONS</span>
+		</button>
+		<button
+			class="tab-btn"
 			class:active={activeTab === 'monitor'}
 			onclick={() => (activeTab = 'monitor')}
 		>
@@ -330,7 +338,14 @@
 		</div>
 	</div>
 
-	{#if activeTab === 'history'}
+	{#if activeTab === 'sessions'}
+	<main class="grid-container">
+		<div class="placeholder-section">
+			<h2>SESSIONS</h2>
+			<p>Session list view coming soon...</p>
+		</div>
+	</main>
+	{:else if activeTab === 'history'}
 	<main class="grid-container history-main">
 		<SessionHistory {activeSessionIds} />
 	</main>
@@ -342,7 +357,7 @@
 	<main class="grid-container history-main">
 		<MemoryViewer />
 	</main>
-	{:else}
+	{:else if activeTab === 'monitor'}
 	<main class="grid-container">
 		<div class="sections-container">
 			<section class="system-section">
