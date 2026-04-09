@@ -49,11 +49,24 @@ pub(crate) fn get_cached_native_title(path: &Path) -> Option<String> {
     if let Ok(mut cache) = NATIVE_TITLE_CACHE.lock() {
         if let Some((cached_mtime, cached_title)) = cache.get(path) {
             if *cached_mtime == mtime {
+                crate::debug_log::log_info(&format!(
+                    "Native title cache hit for {:?}: title={:?}",
+                    path, cached_title
+                ));
                 return cached_title.clone();
+            } else {
+                crate::debug_log::log_info(&format!(
+                    "Native title cache stale for {:?}: cached_mtime={} != current_mtime={}",
+                    path, cached_mtime, mtime
+                ));
             }
         }
         // Cache miss or stale — re-scan
         let title = crate::session::parser::get_native_custom_title_from_file(path);
+        crate::debug_log::log_info(&format!(
+            "Native title cache miss for {:?}: read title={:?}, mtime={}",
+            path, title, mtime
+        ));
         cache.insert(path.to_path_buf(), (mtime, title.clone()));
         title
     } else {
@@ -200,6 +213,10 @@ pub fn detect_and_enrich_sessions_with_detector(
         // Get custom title: Claude Code native /rename takes priority over c9watch's own.
         // Uses a static cache keyed by (path, mtime) to avoid re-scanning the JSONL every cycle.
         let native_title = get_cached_native_title(&session_file_path);
+        crate::debug_log::log_info(&format!(
+            "Session {}: native_title={:?}, custom_titles={:?}",
+            session_id, native_title, custom_titles.get(&session_id)
+        ));
         let custom_title =
             native_title.or_else(|| custom_titles.get(&session_id).cloned());
 

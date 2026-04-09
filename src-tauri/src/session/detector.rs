@@ -226,6 +226,10 @@ impl SessionDetector {
             // This file is the authoritative source and is updated after /clear,
             // so we always get the correct current session.
             if let Some(meta) = self.read_session_metadata(proc.pid) {
+                crate::debug_log::log_info(&format!(
+                    "PID={}: read session_id={} from pid.json",
+                    proc.pid, meta.session_id
+                ));
                 if !used_session_ids.contains(&meta.session_id) {
                     // Find the matching session file and project info
                     if let Some((_, _, project_dir, _, project_name, _)) =
@@ -243,8 +247,23 @@ impl SessionDetector {
                             project_name: project_name.clone(),
                         });
                         continue;
+                    } else {
+                        crate::debug_log::log_warn(&format!(
+                            "PID={}: session_id={} from pid.json not found in session_files",
+                            proc.pid, meta.session_id
+                        ));
                     }
+                } else {
+                    crate::debug_log::log_warn(&format!(
+                        "PID={}: session_id={} already used by another process",
+                        proc.pid, meta.session_id
+                    ));
                 }
+            } else {
+                crate::debug_log::log_info(&format!(
+                    "PID={}: no pid.json found, using fallback matching",
+                    proc.pid
+                ));
             }
 
             // Fallback: heuristic matching by encoded CWD + modification time.
