@@ -201,6 +201,10 @@ impl SessionDetector {
         let mut sessions = Vec::new();
         let mut used_session_ids: std::collections::HashSet<String> =
             std::collections::HashSet::new();
+        // Track which cwds have already been matched to prevent duplicate sessions
+        // from multiple processes in the same directory (e.g., claude main + node workers)
+        let mut used_cwds: std::collections::HashSet<std::path::PathBuf> =
+            std::collections::HashSet::new();
 
         // Sort processes by start_time (newest first) to match newest processes first
         let mut sorted_processes: Vec<&ClaudeProcess> = processes.iter().collect();
@@ -211,6 +215,12 @@ impl SessionDetector {
                 Some(cwd) => cwd,
                 None => continue, // Skip processes without cwd
             };
+
+            // Skip if another process in the same cwd already matched a session
+            // This prevents duplicate sessions from claude's child processes (node workers)
+            if used_cwds.contains(proc_cwd) {
+                continue;
+            }
 
             // Primary: try to resolve session ID from ~/.claude/sessions/<pid>.json
             // This file is the authoritative source and is updated after /clear,
@@ -224,6 +234,7 @@ impl SessionDetector {
                         })
                     {
                         used_session_ids.insert(meta.session_id.clone());
+                        used_cwds.insert(proc_cwd.clone());
                         sessions.push(DetectedSession {
                             pid: proc.pid,
                             cwd: proc_cwd.clone(),
@@ -303,6 +314,7 @@ impl SessionDetector {
                     .map(|s| s.to_string())
                 {
                     used_session_ids.insert(session_id.clone());
+                    used_cwds.insert(proc_cwd.clone());
 
                     sessions.push(DetectedSession {
                         pid: proc.pid,
@@ -382,8 +394,14 @@ impl SessionDetector {
         for (pid, process) in self.system.processes() {
             let name = process.name().to_string_lossy();
 
-            // Skip our own process
-            if name.contains("c9watch") {
+            // Skip our own process (c9watch) and test processes
+            if name.contains("c9watch") || name.contains("session::detect") {
+                continue;
+            }
+
+            // Skip node/libuv internal threads (they share cmd with parent but aren't independent processes)
+            // Names like: libuv-worker, DelayedTaskSche, node::trace_events, etc.
+            if Self::is_node_internal_thread(&name) {
                 continue;
             }
 
@@ -392,11 +410,8 @@ impl SessionDetector {
 
             // Also check command-line args (handles npm-installed Claude Code
             // where process.name() returns "node")
-            let cmd_match = !name_match
-                && process.cmd().iter().any(|arg| {
-                    let a = arg.to_string_lossy();
-                    a.contains("claude") && !a.contains("c9watch")
-                });
+            // But exclude false positives like shell scripts with paths containing "claude"
+            let cmd_match = !name_match && self.is_claude_cmd(process.cmd());
 
             if name_match || cmd_match {
                 let cwd = process.cwd().map(|p| p.to_path_buf());
@@ -411,6 +426,62 @@ impl SessionDetector {
         }
 
         processes
+    }
+
+    /// Check if the process name indicates a node/libuv internal thread.
+    /// These threads inherit cmd from parent but aren't independent Claude processes.
+    fn is_node_internal_thread(name: &str) -> bool {
+        // Known node/libuv internal thread names
+        let thread_names = [
+            "libuv-worker",
+            "DelayedTaskSche",
+            "node::trace_events",
+            "node::platform",
+            "ThreadPoolForeg",
+            "ThpoolTimerThre",
+            "WorkerThread",
+            "UVWorker",
+        ];
+
+        thread_names.iter().any(|t| name.contains(t))
+            // Also skip any name containing "::" (typically internal thread identifiers)
+            || name.contains("::")
+    }
+
+    /// Check if cmd args indicate a genuine claude process.
+    /// Excludes false positives like shell scripts with paths that happen to contain "claude".
+    fn is_claude_cmd(&self, cmd: &[std::ffi::OsString]) -> bool {
+        // Check first arg (the actual executable) - most reliable indicator
+        if let Some(exe) = cmd.first() {
+            let exe_str = exe.to_string_lossy();
+            // Direct claude executable or node running claude
+            if exe_str.contains("claude") && !exe_str.contains("c9watch") {
+                // Exclude shell interpreters (zsh, bash, sh) - they might have claude in paths
+                if !exe_str.contains("zsh")
+                    && !exe_str.contains("bash")
+                    && !exe_str.contains("/bin/sh")
+                    && !exe_str.contains("/usr/bin/sh")
+                {
+                    return true;
+                }
+            }
+        }
+
+        // Check for node running claude (common on npm installs)
+        // Pattern: node /path/to/claude or node ... @anthropic/claude
+        for arg in cmd.iter().skip(1) {
+            let arg_str = arg.to_string_lossy();
+            // Match actual claude command paths, not config/tmp paths
+            if arg_str.contains("claude")
+                && !arg_str.contains("c9watch")
+                && !arg_str.contains(".claude/") // Config directory paths
+                && !arg_str.contains("/tmp/claude-") // Temporary files
+            {
+                return true;
+            }
+        }
+
+        false
     }
 
     /// Enumerates all project directories in ~/.claude/projects/
