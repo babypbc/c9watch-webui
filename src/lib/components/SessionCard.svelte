@@ -148,6 +148,11 @@
 	<div class="card-body">
 		<!-- Header (Summary as Title) -->
 		<div class="card-header">
+			<span class="session-icon">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+				</svg>
+			</span>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<h3
 				class="card-main-title"
@@ -291,6 +296,14 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+	}
+
+	.session-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		color: var(--text-muted);
 	}
 
 	.card-main-title {
