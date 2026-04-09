@@ -271,9 +271,37 @@ impl SessionDetector {
                         continue;
                     } else {
                         crate::debug_log::log_warn(&format!(
-                            "PID={}: session_id={} from pid.json not found in session_files",
+                            "PID={}: session_id={} from pid.json not found in session_files, using fallback",
                             proc.pid, meta.session_id
                         ));
+                        // Fallback: find any available session file in the same project directory
+                        // This handles the case where Claude created a new session (via /clear)
+                        // but the pid.json still references the old session ID
+                        // We match by checking if any session's project_path contains the proc_cwd
+                        if let Some((_, path, project_dir, _, project_name, _)) =
+                            session_files.iter().find(|(_, _, _, project_path, _, _)| {
+                                proc_cwd.starts_with(project_path) || proc_cwd.as_os_str() == project_path.as_os_str()
+                            })
+                        {
+                            if let Some(session_id) = path.file_stem().and_then(|s| s.to_str()) {
+                                if !used_session_ids.contains(session_id) {
+                                    crate::debug_log::log_info(&format!(
+                                        "PID={}: fallback matched session_id={} in project_dir={:?}",
+                                        proc.pid, session_id, project_dir
+                                    ));
+                                    used_session_ids.insert(session_id.to_string());
+                                    used_cwds.insert(proc_cwd.clone());
+                                    sessions.push(DetectedSession {
+                                        pid: proc.pid,
+                                        cwd: proc_cwd.clone(),
+                                        project_path: project_dir.clone(),
+                                        session_id: Some(session_id.to_string()),
+                                        project_name: project_name.clone(),
+                                    });
+                                    continue;
+                                }
+                            }
+                        }
                     }
                 } else {
                     crate::debug_log::log_warn(&format!(
