@@ -146,6 +146,12 @@
 	padding: 0;
 }
 
+html {
+	/* Scale for high DPI displays (WSL on Windows with 150% scaling) */
+	font-size: 16px;
+	zoom: 1.5;
+}
+
 html,
 body {
 	width: 100%;
