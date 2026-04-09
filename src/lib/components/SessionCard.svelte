@@ -14,10 +14,12 @@
 	let { session, compact = false, onexpand, onstop, onopen, onrename }: Props = $props();
 
 	// Extract project directory name from projectPath
-	let projectName = $derived(() => {
-		const parts = session.projectPath.split(/[/\\]/).filter(p => p);
-		return parts.pop() || session.projectPath;
-	});
+	let projectName = $derived(
+		(() => {
+			const parts = session.projectPath.split(/[/\\]/).filter(p => p);
+			return parts.pop() || session.projectPath;
+		})()
+	);
 
 	let needsAttention = $derived(
 		session.status === SessionStatus.NeedsAttention ||
