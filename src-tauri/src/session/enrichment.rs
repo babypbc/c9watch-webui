@@ -341,49 +341,48 @@ fn get_model_context_window(model: &str) -> u64 {
 }
 
 /// Calculate context window usage from session JSONL file
+/// Uses the last assistant message's usage data, which represents the current context state
 pub fn get_context_usage(session_file_path: &Path) -> Option<ContextUsage> {
     let file = File::open(session_file_path).ok()?;
     let reader = BufReader::new(file);
 
-    let mut total_tokens = 0u64;
+    let mut last_cache_read = 0u64;
+    let mut last_cache_creation = 0u64;
     let mut last_model = String::new();
 
+    // We only need the last assistant message's usage, which represents current context
     for line in reader.lines().map_while(Result::ok) {
         if let Ok(value) = serde_json::from_str::<serde_json::Value>(&line) {
             if value.get("type").and_then(|t| t.as_str()) != Some("assistant") {
                 continue;
             }
 
-            // Get the model from the last assistant message
             if let Some(msg) = value.get("message") {
                 if let Some(model) = msg.get("model").and_then(|m| m.as_str()) {
                     last_model = model.to_string();
                 }
 
-                // Sum up all tokens from usage
                 if let Some(usage) = msg.get("usage") {
-                    let input = usage.get("input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let output = usage.get("output_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let cache_creation = usage.get("cache_creation_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let cache_read = usage.get("cache_read_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
-
-                    // Context usage = input tokens (including cache) + output tokens
-                    // Note: We count the effective context usage, which is input + output
-                    total_tokens += input + output + cache_creation + cache_read;
+                    last_cache_read = usage.get("cache_read_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    last_cache_creation = usage.get("cache_creation_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
                 }
             }
         }
     }
 
-    if total_tokens == 0 {
+    // Current context = cached tokens + new input tokens (cache_creation)
+    // This represents what's currently in the model's context window
+    let used = last_cache_read + last_cache_creation;
+
+    if used == 0 {
         return None;
     }
 
     let max_tokens = get_model_context_window(&last_model);
-    let percentage = (total_tokens as f64 / max_tokens as f64) * 100.0;
+    let percentage = (used as f64 / max_tokens as f64) * 100.0;
 
     Some(ContextUsage {
-        used: total_tokens,
+        used,
         max: max_tokens,
         percentage: percentage.min(100.0),
     })
