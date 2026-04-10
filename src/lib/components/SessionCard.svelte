@@ -74,8 +74,10 @@ let renderedUserMessage = $derived.by(() => {
 });
 
 let renderedAssistantMessages = $derived.by(() => {
-	const messages = session.recentAssistantMessages || [];
+	const messages = session.recentAssistantMessages ?? [];
+	if (!Array.isArray(messages)) return [];
 	return messages.map(msg => {
+		if (!msg) return '';
 		const rawHtml = marked.parse(msg, { async: false, breaks: true, gfm: true });
 		return DOMPurify.sanitize(rawHtml as string);
 	});
