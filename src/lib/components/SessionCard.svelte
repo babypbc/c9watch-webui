@@ -496,6 +496,12 @@
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 	}
 
+	.status-header-bar-right {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
 	.status-header-bar-left {
 		display: flex;
 		align-items: center;
@@ -544,7 +550,7 @@
 		font-weight: 600;
 		color: var(--text-primary);
 		background: var(--bg-card);
-		padding: 4px 10px;
+		padding: 4px 6px 4px 10px;
 		border: 1px solid var(--text-muted);
 		letter-spacing: 0.05em;
 	}
