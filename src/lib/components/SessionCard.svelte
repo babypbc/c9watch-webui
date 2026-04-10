@@ -533,9 +533,16 @@ let renderedAssistantMessage = $derived.by(() => {
 	.message-row {
 		display: flex;
 		gap: var(--space-sm);
-		align-items: flex-start;
 		width: 100%;
 		flex-shrink: 0;
+	}
+
+	.message-row.user {
+		align-items: center;
+	}
+
+	.message-row.assistant {
+		align-items: flex-start;
 	}
 
 	.message-icon {
@@ -543,6 +550,9 @@ let renderedAssistantMessage = $derived.by(() => {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.message-row.assistant .message-icon {
 		margin-top: 2px;
 	}
 
@@ -568,7 +578,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		flex: 1;
 		min-width: 0;
 		line-height: 1.7;
-		display: inline-block;
+		display: block;
 		width: 100%;
 	}
 
