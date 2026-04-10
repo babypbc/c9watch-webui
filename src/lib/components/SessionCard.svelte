@@ -551,10 +551,6 @@
 		font-size: 16px;
 		font-weight: 600;
 		color: var(--text-primary);
-		background: var(--bg-card);
-		padding: 4px 6px 4px 10px;
-		border: 1px solid var(--text-muted);
-		letter-spacing: 0.05em;
 		text-align: right;
 	}
 
