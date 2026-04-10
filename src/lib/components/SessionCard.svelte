@@ -556,7 +556,11 @@ let renderedAssistantMessages = $derived.by(() => {
 	}
 
 	.message-row.user {
-		align-items: center;
+		align-items: flex-start;
+	}
+
+	.message-row.user .message-icon {
+		margin-top: 2px;
 	}
 
 	.message-row.assistant {
