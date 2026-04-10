@@ -597,7 +597,7 @@
 								<span class="project-count">{group.sessions.length}</span>
 							</div>
 
-							<div class="all-sessions-grid" class:>
+							<div class="all-sessions-grid">
 								{#each group.sessions as session (session.id)}
 									<div
 										class="card-wrapper"
