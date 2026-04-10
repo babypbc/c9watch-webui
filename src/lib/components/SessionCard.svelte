@@ -568,6 +568,13 @@ let renderedAssistantMessage = $derived.by(() => {
 		color: #ffffff;
 		font-weight: 600;
 		font-size: 15px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		white-space: normal;
+		line-height: 1.5;
 	}
 
 	.message-row.assistant .message-content {
