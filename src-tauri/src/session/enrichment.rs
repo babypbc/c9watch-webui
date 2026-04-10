@@ -228,7 +228,7 @@ pub fn detect_and_enrich_sessions_with_detector(
 
         let latest_message = get_latest_assistant_message(&entries);
         let latest_user_message = get_latest_user_message(&entries);
-        let recent_assistant_messages = get_recent_assistant_messages(&entries, 5);
+        let recent_assistant_messages = get_recent_assistant_messages(&entries, 10);
         let pending_tool_name = get_pending_tool_name(&entries);
         let pending_tool_input = get_pending_tool_input(&entries);
 
