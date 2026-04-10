@@ -199,7 +199,7 @@ pub fn detect_and_enrich_sessions_with_detector(
 
         // Parse the session JSONL file to determine status and get latest message
         let session_file_path = detected.project_path.join(format!("{}.jsonl", session_id));
-        let entries = match parse_last_n_entries(&session_file_path, 20) {
+        let entries = match parse_last_n_entries(&session_file_path, 200) {
             Ok(entries) => entries,
             Err(e) => {
                 crate::debug_log::log_warn(&format!(
@@ -506,15 +506,22 @@ pub fn get_latest_user_message(
             if crate::session::parser::is_system_content(&message.content) {
                 crate::debug_log::log_info(&format!(
                     "Skipping user message (system content): {}",
-                    &message.content[..message.content.len().min(50)]
+                    truncate_string(&message.content, 50)
+                ));
+                continue;
+            }
+            // Skip tool result messages (they are not actual user input)
+            if message.is_tool_result {
+                crate::debug_log::log_info(&format!(
+                    "Skipping user message (is_tool_result): {}",
+                    truncate_string(&message.content, 50)
                 ));
                 continue;
             }
             crate::debug_log::log_info(&format!(
-                "Found user message (is_tool_result={}, content_len={}): {}",
-                message.is_tool_result,
+                "Found user message (content_len={}): {}",
                 message.content.len(),
-                &message.content[..message.content.len().min(50)]
+                truncate_string(&message.content, 50)
             ));
             return truncate_string(&message.content, 200);
         }

@@ -76,8 +76,8 @@
 	--text-muted: #666666;
 
 	/* Status Colors - Sharp & Clear */
-	--status-working: #7928ca;
-	--status-working-glow: rgba(121, 40, 202, 0.25);
+	--status-working: #0070f3;
+	--status-working-glow: rgba(0, 112, 243, 0.25);
 	--status-permission: #ff6600;
 	--status-permission-glow: rgba(255, 102, 0, 0.25);
 	--status-input: #00ff88;

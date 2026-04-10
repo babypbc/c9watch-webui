@@ -275,13 +275,25 @@ let renderedAssistantMessage = $derived.by(() => {
 		<div class="task-preview">
 			{#if renderedUserMessage}
 				<div class="message-row user">
-					<span class="message-label">You:</span>
+					<span class="message-icon">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+							<circle cx="12" cy="7" r="4" />
+						</svg>
+					</span>
 					<span class="message-content">{@html renderedUserMessage}</span>
 				</div>
 			{/if}
 			{#if renderedAssistantMessage}
 				<div class="message-row assistant">
-					<span class="message-label">Claude:</span>
+					<span class="message-icon">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<rect x="3" y="3" width="18" height="18" rx="2" />
+							<path d="M9 9h6" />
+							<path d="M9 13h6" />
+							<path d="M9 17h6" />
+						</svg>
+					</span>
 					<span class="message-content">{@html renderedAssistantMessage}</span>
 				</div>
 			{/if}
@@ -503,7 +515,6 @@ let renderedAssistantMessage = $derived.by(() => {
 	/* Task Preview */
 	.task-preview {
 		font-size: 14px;
-		color: var(--text-secondary);
 		line-height: 1.6;
 		margin-top: var(--space-xs);
 		margin-bottom: 0;
@@ -520,21 +531,36 @@ let renderedAssistantMessage = $derived.by(() => {
 		align-items: flex-start;
 	}
 
-	.message-row.user .message-label {
-		color: var(--status-input);
-		font-weight: 600;
+	.message-icon {
 		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 2px;
 	}
 
-	.message-row.assistant .message-label {
-		color: var(--status-working);
+	.message-row.user .message-icon {
+		color: var(--status-input);
+	}
+
+	.message-row.assistant .message-icon {
+		color: var(--text-muted);
+	}
+
+	.message-row.user .message-content {
+		color: #ffffff;
 		font-weight: 600;
-		flex-shrink: 0;
+		font-size: 15px;
+	}
+
+	.message-row.assistant .message-content {
+		color: var(--text-secondary);
 	}
 
 	.message-content {
 		flex: 1;
 		min-width: 0;
+		line-height: 1.7;
 	}
 
 	.message-content :global(p) {
@@ -545,18 +571,16 @@ let renderedAssistantMessage = $derived.by(() => {
 		margin-bottom: 0;
 	}
 
-
-
-	.task-preview :global(code) {
+	.message-content :global(code) {
 		background: var(--bg-base);
 		padding: 2px 6px;
 		border-radius: 4px;
 		font-family: var(--font-mono);
 		font-size: 13px;
-		color: var(--text-primary);
+		color: #9b7ffb;
 	}
 
-	.task-preview :global(pre) {
+	.message-content :global(pre) {
 		background: var(--bg-base);
 		padding: var(--space-sm);
 		border-radius: var(--radius-md);
@@ -566,20 +590,21 @@ let renderedAssistantMessage = $derived.by(() => {
 		word-wrap: break-word;
 	}
 
-	.task-preview :global(pre code) {
+	.message-content :global(pre code) {
 		background: transparent;
 		padding: 0;
 	}
 
-	.task-preview :global(strong) {
-		color: var(--text-primary);
+	.message-content :global(strong) {
+		color: #aaaaaa;
 		font-weight: 600;
 	}
 
-	.task-preview :global(a) {
-		color: var(--text-primary);
+	.message-content :global(a) {
+		color: #0070f3;
 		text-decoration: underline;
 	}
+
 
 	.task-preview :global(ul),
 	.task-preview :global(ol) {
@@ -589,40 +614,6 @@ let renderedAssistantMessage = $derived.by(() => {
 
 	.task-preview :global(li) {
 		margin-bottom: var(--space-xs);
-	}
-
-
-
-	.task-preview :global(code) {
-		background: var(--bg-base);
-		padding: 2px 6px;
-		border-radius: 4px;
-		font-family: var(--font-mono);
-		font-size: 13px;
-		color: var(--text-primary);
-	}
-
-	.task-preview :global(pre) {
-		background: var(--bg-base);
-		padding: var(--space-sm);
-		border-radius: var(--radius-md);
-		overflow-x: auto;
-		margin: var(--space-xs) 0;
-	}
-
-	.task-preview :global(pre code) {
-		background: transparent;
-		padding: 0;
-	}
-
-	.task-preview :global(strong) {
-		color: var(--text-primary);
-		font-weight: 600;
-	}
-
-	.task-preview :global(a) {
-		color: var(--text-primary);
-		text-decoration: underline;
 	}
 
 	/* Status Header Bar - matches MONITOR page status-header style */
