@@ -675,7 +675,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--space-md);
-		margin-top: var(--space-xs);
+		margin-top: 2px;
 	}
 
 	.git-info {
