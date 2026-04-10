@@ -563,6 +563,12 @@ fn full_session(s: session::enrichment::Session) -> serde_json::Value {
             serde_json::json!(latest_message),
         );
     }
+    if !s.recent_assistant_messages.is_empty() {
+        obj.insert(
+            "recentAssistantMessages".to_string(),
+            serde_json::json!(s.recent_assistant_messages),
+        );
+    }
     if let Some(ref tool) = s.pending_tool_name {
         obj.insert("pendingToolName".to_string(), serde_json::json!(tool));
     }
