@@ -486,13 +486,63 @@ let renderedPreview = $derived.by(() => {
 	.task-preview {
 		font-size: 15px;
 		color: var(--text-secondary);
-		line-height: 1.5;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		line-clamp: 3;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
+		line-height: 1.6;
+		margin-top: var(--space-xs);
+		margin-bottom: 0;
+		flex: 1;
+		overflow-y: auto;
+	}
+
+	.task-preview :global(p) {
+		margin: 0 0 var(--space-xs) 0;
+	}
+
+	.task-preview :global(p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.task-preview :global(code) {
+		background: var(--bg-base);
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--text-primary);
+	}
+
+	.task-preview :global(pre) {
+		background: var(--bg-base);
+		padding: var(--space-sm);
+		border-radius: var(--radius-md);
+		overflow-x: auto;
 		margin: var(--space-xs) 0;
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+
+	.task-preview :global(pre code) {
+		background: transparent;
+		padding: 0;
+	}
+
+	.task-preview :global(strong) {
+		color: var(--text-primary);
+		font-weight: 600;
+	}
+
+	.task-preview :global(a) {
+		color: var(--text-primary);
+		text-decoration: underline;
+	}
+
+	.task-preview :global(ul),
+	.task-preview :global(ol) {
+		margin: var(--space-xs) 0;
+		padding-left: var(--space-md);
+	}
+
+	.task-preview :global(li) {
+		margin-bottom: var(--space-xs);
 	}
 
 	.task-preview :global(p) {
