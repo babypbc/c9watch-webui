@@ -21,6 +21,22 @@
 		})()
 	);
 
+	// Parse git status string (e.g., "+1 -0") and return formatted display
+	function parseGitStatus(status: string | null): { added: number; deleted: number; hasChanges: boolean } | null {
+		if (!status) return null;
+		const match = status.match(/\+(\d+)\s+-(\d+)/);
+		if (!match) return null;
+		const added = parseInt(match[1], 10);
+		const deleted = parseInt(match[2], 10);
+		return {
+			added,
+			deleted,
+			hasChanges: added > 0 || deleted > 0
+		};
+	}
+
+	let gitStatusInfo = $derived(parseGitStatus(session.gitStatus));
+
 	let needsAttention = $derived(
 		session.status === SessionStatus.NeedsAttention ||
 			session.status === SessionStatus.WaitingForInput
@@ -178,6 +194,16 @@
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
 				{/if}
 			</span>
+			<!-- Stats (message count & time) - right aligned -->
+			<div class="header-stats">
+				<span class="message-count">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+					</svg>
+					{session.messageCount}
+				</span>
+				<span class="time-badge">{formatTimeSince(session.modified)}</span>
+			</div>
 		</div>
 
 		{#if tooltipText}
@@ -186,38 +212,23 @@
 			</div>
 		{/if}
 
-		<!-- Project & Stats Row -->
-		<div class="stats-row">
-			{#if !compact}
-				<div class="stats-group">
-					<span class="message-count">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-						</svg>
-						{session.messageCount}
-					</span>
-					<span class="time-badge">{formatTimeSince(session.modified)}</span>
-				</div>
-			{/if}
-		</div>
-
 		{#if !compact}
 			<!-- Git Branch & Status -->
-			{#if session.gitBranch || session.gitStatus}
-				<div class="git-info">
-					{#if session.gitBranch}
-						<div class="git-branch">
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<line x1="6" y1="3" x2="6" y2="15" />
-								<circle cx="18" cy="6" r="3" />
-								<circle cx="6" cy="18" r="3" />
-								<path d="M18 9a9 9 0 0 1-9 9" />
-							</svg>
-							<span class="branch-name">{session.gitBranch}</span>
-						</div>
-					{/if}
-					{#if session.gitStatus}
-						<span class="git-status">{session.gitStatus}</span>
+			{#if session.gitBranch}
+				<div class="git-line">
+					<div class="git-branch">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="6" y1="3" x2="6" y2="15" />
+							<circle cx="18" cy="6" r="3" />
+							<circle cx="6" cy="18" r="3" />
+							<path d="M18 9a9 9 0 0 1-9 9" />
+						</svg>
+						<span class="branch-name">{session.gitBranch}</span>
+					</div>
+					{#if gitStatusInfo}
+						<span class="git-status" class:has-changes={gitStatusInfo.hasChanges}>
+							(+{gitStatusInfo.added}, -{gitStatusInfo.deleted})
+						</span>
 					{/if}
 				</div>
 			{/if}
@@ -303,6 +314,14 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+		flex-wrap: wrap;
+	}
+
+	.header-stats {
+		margin-left: auto;
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
 	}
 
 	.session-icon {
@@ -374,13 +393,20 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 	}
 
+	.git-line {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		flex-wrap: wrap;
+	}
+
 	.git-branch {
 		display: flex;
 		align-items: center;
 		gap: 6px; /* 4px * 1.5 = 6px */
 		font-family: var(--font-mono);
 		font-size: 18px; /* 12px * 1.5 = 18px */
-		color: var(--text-muted);
+		color: var(--text-secondary);
 		text-transform: lowercase;
 		min-width: 0;
 	}
@@ -397,13 +423,6 @@
 		max-width: 300px; /* 200px * 1.5 = 300px */
 	}
 
-	.git-info {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-sm);
-	}
-
 	.git-status {
 		font-family: var(--font-mono);
 		font-size: 18px; /* 12px * 1.5 = 18px */
@@ -411,6 +430,10 @@
 		color: var(--text-muted);
 		letter-spacing: 0.05em;
 		white-space: nowrap;
+	}
+
+	.git-status.has-changes {
+		color: var(--status-permission);
 	}
 
 	.time-badge {
