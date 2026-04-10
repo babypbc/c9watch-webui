@@ -68,8 +68,9 @@
 	let cardTitle = $derived(session.customTitle || session.summary || session.firstPrompt);
 
 let renderedUserMessage = $derived.by(() => {
-	if (!session.latestUserMessage) return '';
-	const rawHtml = marked.parse(session.latestUserMessage, { async: false, breaks: true, gfm: true });
+	const userMsg = session.latestUserMessage || session.firstPrompt;
+	if (!userMsg) return '';
+	const rawHtml = marked.parse(userMsg, { async: false, breaks: true, gfm: true });
 	return DOMPurify.sanitize(rawHtml as string);
 });
 
