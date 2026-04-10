@@ -67,10 +67,15 @@
 
 	let cardTitle = $derived(session.customTitle || session.summary || session.firstPrompt);
 
-let renderedPreview = $derived.by(() => {
-	const previewText = session.latestMessage || session.firstPrompt;
-	if (!previewText) return '';
-	const rawHtml = marked.parse(previewText, { async: false, breaks: true, gfm: true });
+let renderedUserMessage = $derived.by(() => {
+	if (!session.latestUserMessage) return '';
+	const rawHtml = marked.parse(session.latestUserMessage, { async: false, breaks: true, gfm: true });
+	return DOMPurify.sanitize(rawHtml as string);
+});
+
+let renderedAssistantMessage = $derived.by(() => {
+	if (!session.latestMessage) return '';
+	const rawHtml = marked.parse(session.latestMessage, { async: false, breaks: true, gfm: true });
 	return DOMPurify.sanitize(rawHtml as string);
 });
 
@@ -267,7 +272,20 @@ let renderedPreview = $derived.by(() => {
 		</div>
 
 		<!-- Message Preview -->
-		<div class="task-preview">{@html renderedPreview}</div>
+		<div class="task-preview">
+			{#if renderedUserMessage}
+				<div class="message-row user">
+					<span class="message-label">You:</span>
+					<span class="message-content">{@html renderedUserMessage}</span>
+				</div>
+			{/if}
+			{#if renderedAssistantMessage}
+				<div class="message-row assistant">
+					<span class="message-label">Claude:</span>
+					<span class="message-content">{@html renderedAssistantMessage}</span>
+				</div>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Confirmation Dialog -->
@@ -484,22 +502,50 @@ let renderedPreview = $derived.by(() => {
 
 	/* Task Preview */
 	.task-preview {
-		font-size: 15px;
+		font-size: 14px;
 		color: var(--text-secondary);
 		line-height: 1.6;
 		margin-top: var(--space-xs);
 		margin-bottom: 0;
 		flex: 1;
 		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
 	}
 
-	.task-preview :global(p) {
+	.message-row {
+		display: flex;
+		gap: var(--space-sm);
+		align-items: flex-start;
+	}
+
+	.message-row.user .message-label {
+		color: var(--status-input);
+		font-weight: 600;
+		flex-shrink: 0;
+	}
+
+	.message-row.assistant .message-label {
+		color: var(--status-working);
+		font-weight: 600;
+		flex-shrink: 0;
+	}
+
+	.message-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.message-content :global(p) {
 		margin: 0 0 var(--space-xs) 0;
 	}
 
-	.task-preview :global(p:last-child) {
+	.message-content :global(p:last-child) {
 		margin-bottom: 0;
 	}
+
+
 
 	.task-preview :global(code) {
 		background: var(--bg-base);
@@ -545,13 +591,7 @@ let renderedPreview = $derived.by(() => {
 		margin-bottom: var(--space-xs);
 	}
 
-	.task-preview :global(p) {
-		margin: 0 0 var(--space-xs) 0;
-	}
 
-	.task-preview :global(p:last-child) {
-		margin-bottom: 0;
-	}
 
 	.task-preview :global(code) {
 		background: var(--bg-base);

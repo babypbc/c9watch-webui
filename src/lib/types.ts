@@ -52,8 +52,11 @@ export interface Session {
   /** Current status of the session */
   status: SessionStatus;
 
-  /** Content of the latest message */
+  /** Content of the latest assistant message */
   latestMessage: string;
+
+  /** Content of the latest user message */
+  latestUserMessage: string;
 
   /** Name of the tool or reason awaiting attention (if status is NeedsAttention) */
   pendingToolName: string | null;

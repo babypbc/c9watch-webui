@@ -86,6 +86,7 @@ export function getDemoSessions(): Session[] {
 			modified: minutesAgo(2),
 			status: SessionStatus.NeedsAttention,
 			latestMessage: 'I need to write to src/auth/providers.ts — may I proceed?',
+				latestUserMessage: 'Add OAuth2 login with Google and GitHub providers',
 			pendingToolName: 'Write',
 			contextUsage: { used: 136000, max: 200000, percentage: 68 }
 		},
@@ -102,7 +103,8 @@ export function getDemoSessions(): Session[] {
 			messageCount: 87,
 			modified: minutesAgo(5),
 			status: SessionStatus.Working,
-			latestMessage: 'Running the profiler on the VirtualizedTable component to identify the bottleneck...',
+			latestUserMessage: 'Profile and fix the rendering performance regression in the dashboard',
+				latestMessage: 'Running the profiler on the VirtualizedTable component to identify the bottleneck...',
 			pendingToolName: null,
 			contextUsage: { used: 45000, max: 200000, percentage: 22.5 }
 		},
@@ -121,7 +123,8 @@ export function getDemoSessions(): Session[] {
 			messageCount: 21,
 			modified: minutesAgo(1),
 			status: SessionStatus.NeedsAttention,
-			latestMessage: 'I need to run `npm install ioredis` — allow?',
+			latestUserMessage: 'Implement token-bucket rate limiting middleware',
+				latestMessage: 'I need to run `npm install ioredis` — allow?',
 			pendingToolName: 'Bash',
 			contextUsage: { used: 89000, max: 200000, percentage: 44.5 }
 		},
@@ -138,7 +141,8 @@ export function getDemoSessions(): Session[] {
 			messageCount: 156,
 			modified: minutesAgo(8),
 			status: SessionStatus.Working,
-			latestMessage: 'Writing test case for subscription renewal webhook with idempotency check...',
+			latestUserMessage: 'Write integration tests for the payments webhook handler',
+				latestMessage: 'Writing test case for subscription renewal webhook with idempotency check...',
 			pendingToolName: null,
 			contextUsage: { used: 178000, max: 200000, percentage: 89 }
 		},
@@ -157,7 +161,8 @@ export function getDemoSessions(): Session[] {
 			messageCount: 42,
 			modified: minutesAgo(15),
 			status: SessionStatus.WaitingForInput,
-			latestMessage: 'Done! The wizard is at src/commands/init.ts. Run `cli-tools init` to try it.',
+			latestUserMessage: 'Build an interactive configuration wizard for first-time setup',
+				latestMessage: 'Done! The wizard is at src/commands/init.ts. Run `cli-tools init` to try it.',
 			pendingToolName: null,
 			contextUsage: { used: 52000, max: 200000, percentage: 26 }
 		},
@@ -174,7 +179,8 @@ export function getDemoSessions(): Session[] {
 			messageCount: 63,
 			modified: minutesAgo(60),
 			status: SessionStatus.WaitingForInput,
-			latestMessage: 'All 14 command handlers have been migrated to the Result pattern. Tests pass.',
+			latestUserMessage: 'Refactor error handling to use typed Result pattern',
+				latestMessage: 'All 14 command handlers have been migrated to the Result pattern. Tests pass.',
 			pendingToolName: null,
 			contextUsage: { used: 12000, max: 200000, percentage: 6 }
 		}

@@ -27,6 +27,7 @@ pub struct Session {
     pub modified: String,
     pub status: SessionStatus,
     pub latest_message: String,
+    pub latest_user_message: String,
     pub pending_tool_name: Option<String>,
     /// The input/arguments of the pending tool (when status is NeedsPermission)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,7 +224,8 @@ pub fn detect_and_enrich_sessions_with_detector(
             }
         };
 
-        let latest_message = get_latest_message_from_entries(&entries);
+        let latest_message = get_latest_assistant_message(&entries);
+        let latest_user_message = get_latest_user_message(&entries);
         let pending_tool_name = get_pending_tool_name(&entries);
         let pending_tool_input = get_pending_tool_input(&entries);
 
@@ -270,7 +272,8 @@ pub fn detect_and_enrich_sessions_with_detector(
             message_count,
             modified,
             status,
-            latest_message,
+            latest_message: latest_message,
+            latest_user_message: latest_user_message,
             pending_tool_name,
             pending_tool_input,
             context_usage,
@@ -489,8 +492,8 @@ pub fn truncate_string(s: &str, max_chars: usize) -> String {
     }
 }
 
-/// Extract the latest message content from session entries
-pub fn get_latest_message_from_entries(
+/// Extract the latest user message content from session entries
+pub fn get_latest_user_message(
     entries: &[crate::session::parser::SessionEntry],
 ) -> String {
     if entries.is_empty() {
@@ -498,33 +501,44 @@ pub fn get_latest_message_from_entries(
     }
 
     for entry in entries.iter().rev() {
-        match entry {
-            crate::session::parser::SessionEntry::User { message, .. } => {
-                // Skip tool result entries and system-generated command messages
-                if message.is_tool_result
-                    || crate::session::parser::is_system_content(&message.content)
-                {
-                    continue;
-                }
-                return truncate_string(&message.content, 200);
+        if let crate::session::parser::SessionEntry::User { message, .. } = entry {
+            // Skip tool result entries and system-generated command messages
+            if message.is_tool_result
+                || crate::session::parser::is_system_content(&message.content)
+            {
+                continue;
             }
-            crate::session::parser::SessionEntry::Assistant { message, .. } => {
-                for content in message.content.iter().rev() {
-                    match content {
-                        crate::session::parser::MessageContent::Text { text } => {
-                            return truncate_string(text, 200);
-                        }
-                        crate::session::parser::MessageContent::Thinking { thinking, .. } => {
-                            return truncate_string(thinking, 200);
-                        }
-                        crate::session::parser::MessageContent::ToolUse { name, .. } => {
-                            return format!("Executing {}...", name);
-                        }
-                        _ => continue,
+            return truncate_string(&message.content, 200);
+        }
+    }
+
+    String::new()
+}
+
+/// Extract the latest assistant message content from session entries
+pub fn get_latest_assistant_message(
+    entries: &[crate::session::parser::SessionEntry],
+) -> String {
+    if entries.is_empty() {
+        return String::new();
+    }
+
+    for entry in entries.iter().rev() {
+        if let crate::session::parser::SessionEntry::Assistant { message, .. } = entry {
+            for content in message.content.iter().rev() {
+                match content {
+                    crate::session::parser::MessageContent::Text { text } => {
+                        return truncate_string(text, 200);
                     }
+                    crate::session::parser::MessageContent::Thinking { thinking, .. } => {
+                        return truncate_string(thinking, 200);
+                    }
+                    crate::session::parser::MessageContent::ToolUse { name, .. } => {
+                        return format!("Executing {}...", name);
+                    }
+                    _ => continue,
                 }
             }
-            _ => continue,
         }
     }
 
