@@ -287,19 +287,21 @@ let renderedAssistantMessages = $derived.by(() => {
 				</div>
 			{/if}
 			{#if renderedAssistantMessages.length > 0}
-				{#each renderedAssistantMessages as msg (msg)}
-					<div class="message-row assistant">
-						<span class="message-icon">
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<rect x="3" y="3" width="18" height="18" rx="2" />
-								<path d="M9 9h6" />
-								<path d="M9 13h6" />
-								<path d="M9 17h6" />
-							</svg>
-						</span>
-						<span class="message-content">{@html msg}</span>
-					</div>
-				{/each}
+				<div class="assistant-messages-container">
+					{#each renderedAssistantMessages as msg (msg)}
+						<div class="message-row assistant">
+							<span class="message-icon">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="3" y="3" width="18" height="18" rx="2" />
+									<path d="M9 9h6" />
+									<path d="M9 13h6" />
+									<path d="M9 17h6" />
+								</svg>
+							</span>
+							<span class="message-content">{@html msg}</span>
+						</div>
+					{/each}
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -530,13 +532,26 @@ let renderedAssistantMessages = $derived.by(() => {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+		gap: var(--space-xs);
+		min-height: 0;
+	}
+
+	.message-row.user {
+		flex-shrink: 0;
+	}
+
+	.assistant-messages-container {
+		flex: 1;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 		justify-content: flex-end;
 		gap: var(--space-xs);
 		min-height: 0;
 		position: relative;
 	}
 
-	.task-preview::before {
+	.assistant-messages-container::before {
 		content: '';
 		position: absolute;
 		top: 0;
