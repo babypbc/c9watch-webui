@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Session } from '$lib/types';
 	import { SessionStatus } from '$lib/types';
+	import { marked } from 'marked';
+	import DOMPurify from 'dompurify';
 
 	interface Props {
 		session: Session;
@@ -64,6 +66,13 @@
 	function tipMove(e: MouseEvent) { tooltipX = e.clientX + 12; tooltipY = e.clientY + 12; }
 
 	let cardTitle = $derived(session.customTitle || session.summary || session.firstPrompt);
+
+let renderedPreview = $derived.by(() => {
+	const previewText = session.latestMessage || session.firstPrompt;
+	if (!previewText) return '';
+	const rawHtml = marked.parse(previewText, { async: false, breaks: true, gfm: true });
+	return DOMPurify.sanitize(rawHtml as string);
+});
 
 	function getStatusLabel(): string {
 		switch (session.status) {
@@ -258,7 +267,7 @@
 		</div>
 
 		<!-- Message Preview -->
-		<p class="task-preview">{session.latestMessage || session.firstPrompt}</p>
+		<div class="task-preview">{@html renderedPreview}</div>
 	</div>
 
 	<!-- Confirmation Dialog -->
@@ -475,15 +484,55 @@
 
 	/* Task Preview */
 	.task-preview {
-		font-size: 21px; /* 14px * 1.5 = 21px */
+		font-size: 15px;
 		color: var(--text-secondary);
 		line-height: 1.5;
 		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		margin: var(--space-xs) 0;
+	}
+
+	.task-preview :global(p) {
+		margin: 0 0 var(--space-xs) 0;
+	}
+
+	.task-preview :global(p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.task-preview :global(code) {
+		background: var(--bg-base);
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-family: var(--font-mono);
+		font-size: 13px;
+		color: var(--text-primary);
+	}
+
+	.task-preview :global(pre) {
+		background: var(--bg-base);
+		padding: var(--space-sm);
+		border-radius: var(--radius-md);
+		overflow-x: auto;
+		margin: var(--space-xs) 0;
+	}
+
+	.task-preview :global(pre code) {
+		background: transparent;
+		padding: 0;
+	}
+
+	.task-preview :global(strong) {
+		color: var(--text-primary);
+		font-weight: 600;
+	}
+
+	.task-preview :global(a) {
+		color: var(--text-primary);
+		text-decoration: underline;
 	}
 
 	/* Status Header Bar - matches MONITOR page status-header style */
