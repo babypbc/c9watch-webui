@@ -31,6 +31,21 @@ pub struct Session {
     /// The input/arguments of the pending tool (when status is NeedsPermission)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pending_tool_input: Option<serde_json::Value>,
+    /// Current context window usage (used/max in tokens)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_usage: Option<ContextUsage>,
+}
+
+/// Context window usage information
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ContextUsage {
+    /// Tokens currently used in context
+    pub used: u64,
+    /// Maximum context window size for the model
+    pub max: u64,
+    /// Percentage used (0-100)
+    pub percentage: f64,
 }
 
 /// Cache for native custom titles, keyed by file path.
@@ -234,6 +249,11 @@ pub fn detect_and_enrich_sessions_with_detector(
             "Session {}: git_branch={:?}, git_status={:?}",
             session_id, git_branch, git_status
         ));
+        let context_usage = get_context_usage(&session_file_path);
+        crate::debug_log::log_info(&format!(
+            "Session {}: context_usage={:?}",
+            session_id, context_usage
+        ));
         let custom_title =
             native_title.or_else(|| custom_titles.get(&session_id).cloned());
 
@@ -253,6 +273,7 @@ pub fn detect_and_enrich_sessions_with_detector(
             latest_message,
             pending_tool_name,
             pending_tool_input,
+            context_usage,
         });
     }
 
@@ -291,6 +312,81 @@ pub fn get_git_branch(project_path: &Path) -> Option<String> {
                 None
             }
         })
+}
+
+/// Get the max context window size for a model (in tokens)
+fn get_model_context_window(model: &str) -> u64 {
+    // Source: Anthropic API documentation
+    if model.contains("claude-sonnet-4") || model.contains("claude-sonnet4") {
+        200_000
+    } else if model.contains("claude-opus-4-6") || model.contains("claude-opus-4-5") {
+        200_000
+    } else if model.contains("claude-opus") {
+        200_000
+    } else if model.contains("claude-haiku-4-5") || model.contains("claude-haiku4") {
+        200_000
+    } else if model.contains("claude-haiku") {
+        200_000
+    } else if model.contains("claude-3-5-sonnet") {
+        200_000
+    } else if model.contains("claude-3-opus") {
+        200_000
+    } else if model.contains("claude-3-haiku") {
+        200_000
+    } else if model.contains("kimi") {
+        256_000  // Kimi K2.5 supports 256K
+    } else {
+        200_000  // Default to 200K for unknown models
+    }
+}
+
+/// Calculate context window usage from session JSONL file
+pub fn get_context_usage(session_file_path: &Path) -> Option<ContextUsage> {
+    let file = File::open(session_file_path).ok()?;
+    let reader = BufReader::new(file);
+
+    let mut total_tokens = 0u64;
+    let mut last_model = String::new();
+
+    for line in reader.lines().map_while(Result::ok) {
+        if let Ok(value) = serde_json::from_str::<serde_json::Value>(&line) {
+            if value.get("type").and_then(|t| t.as_str()) != Some("assistant") {
+                continue;
+            }
+
+            // Get the model from the last assistant message
+            if let Some(msg) = value.get("message") {
+                if let Some(model) = msg.get("model").and_then(|m| m.as_str()) {
+                    last_model = model.to_string();
+                }
+
+                // Sum up all tokens from usage
+                if let Some(usage) = msg.get("usage") {
+                    let input = usage.get("input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let output = usage.get("output_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let cache_creation = usage.get("cache_creation_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let cache_read = usage.get("cache_read_input_tokens").and_then(|v| v.as_u64()).unwrap_or(0);
+
+                    // Context usage = input tokens (including cache) + output tokens
+                    // Note: We count the effective context usage, which is input + output
+                    total_tokens += input + output + cache_creation + cache_read;
+                }
+            }
+        }
+    }
+
+    if total_tokens == 0 {
+        return None;
+    }
+
+    let max_tokens = get_model_context_window(&last_model);
+    let percentage = (total_tokens as f64 / max_tokens as f64) * 100.0;
+
+    Some(ContextUsage {
+        used: total_tokens,
+        max: max_tokens,
+        percentage: percentage.min(100.0),
+    })
 }
 
 /// Get git status summary as "+N -M" (changed/deleted files) for a directory

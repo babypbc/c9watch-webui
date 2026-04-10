@@ -57,6 +57,13 @@ export interface Session {
 
   /** Name of the tool or reason awaiting attention (if status is NeedsAttention) */
   pendingToolName: string | null;
+
+  /** Context window usage information (used/max tokens) */
+  contextUsage: {
+    used: number;
+    max: number;
+    percentage: number;
+  } | null;
 }
 
 /**

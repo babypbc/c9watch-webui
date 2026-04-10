@@ -37,6 +37,17 @@
 
 	let gitStatusInfo = $derived(parseGitStatus(session.gitStatus));
 
+	// Format context usage (e.g., "136K/200K (68%)")
+	function formatContextUsage(usage: { used: number; max: number; percentage: number } | null): string {
+		if (!usage) return '';
+		const formatTokens = (n: number) => {
+			if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+			if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+			return n.toString();
+		};
+		return `${formatTokens(usage.used)}/${formatTokens(usage.max)} (${usage.percentage.toFixed(0)}%)`;
+	}
+
 	let needsAttention = $derived(
 		session.status === SessionStatus.NeedsAttention ||
 			session.status === SessionStatus.WaitingForInput
@@ -157,7 +168,14 @@
 			<span class="status-indicator"></span>
 			<span class="status-label">{getStatusLabel()}</span>
 		</div>
-		<span class="project-name-badge">{projectName}</span>
+		<div class="header-bar-right">
+			{#if session.contextUsage}
+				<span class="context-usage" title="Context window usage">
+					{formatContextUsage(session.contextUsage)}
+				</span>
+			{/if}
+			<span class="project-name-badge">{projectName}</span>
+		</div>
 	</div>
 
 	<!-- Card Content -->
@@ -613,6 +631,21 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+	}
+
+	.header-bar-right {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+	}
+
+	.context-usage {
+		font-family: var(--font-mono);
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-muted);
+		letter-spacing: 0.05em;
+		white-space: nowrap;
 	}
 
 	.status-header-bar .status-indicator {
