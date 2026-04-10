@@ -547,7 +547,7 @@ let renderedAssistantMessage = $derived.by(() => {
 	}
 
 	.message-row.user .message-icon {
-		color: var(--status-input);
+		color: #ffffff;
 	}
 
 	.message-row.assistant .message-icon {
