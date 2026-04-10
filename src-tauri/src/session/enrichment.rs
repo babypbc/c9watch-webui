@@ -502,16 +502,25 @@ pub fn get_latest_user_message(
 
     for entry in entries.iter().rev() {
         if let crate::session::parser::SessionEntry::User { message, .. } = entry {
-            // Skip tool result entries and system-generated command messages
-            if message.is_tool_result
-                || crate::session::parser::is_system_content(&message.content)
-            {
+            // Skip system-generated command messages
+            if crate::session::parser::is_system_content(&message.content) {
+                crate::debug_log::log_info(&format!(
+                    "Skipping user message (system content): {}",
+                    &message.content[..message.content.len().min(50)]
+                ));
                 continue;
             }
+            crate::debug_log::log_info(&format!(
+                "Found user message (is_tool_result={}, content_len={}): {}",
+                message.is_tool_result,
+                message.content.len(),
+                &message.content[..message.content.len().min(50)]
+            ));
             return truncate_string(&message.content, 200);
         }
     }
 
+    crate::debug_log::log_info("No user message found in entries");
     String::new()
 }
 
