@@ -325,7 +325,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 		text-align: left;
 		width: 100%;
-		height: 352px; /* 235px * 1.5 = 352.5px */
+		height: 100%;
 		overflow: hidden;
 	}
 
@@ -343,6 +343,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		flex-direction: column;
 		gap: var(--space-sm);
 		padding: var(--space-md) var(--space-lg) var(--space-lg);
+		overflow: hidden;
 	}
 
 	/* Header Row: Title (left 50%) + Context Usage (right 50%) */
@@ -523,6 +524,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-xs);
+		min-height: 0;
 	}
 
 	.message-row {
