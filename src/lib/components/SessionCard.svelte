@@ -331,7 +331,7 @@ let renderedAssistantMessages = $derived.by(() => {
 		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 		text-align: left;
 		width: 100%;
-		height: 100%;
+		height: 33.33vh;
 		overflow: hidden;
 	}
 
