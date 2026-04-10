@@ -565,14 +565,31 @@ pub fn get_latest_assistant_message(
     String::new()
 }
 
-/// Extract recent assistant messages (up to 5 messages) for display
+/// Extract recent assistant messages (up to max_messages) after the last user message
 pub fn get_recent_assistant_messages(
     entries: &[crate::session::parser::SessionEntry],
     max_messages: usize,
 ) -> Vec<String> {
+    // Find the position of the last user message
+    let last_user_index = entries.iter().rposition(|entry| {
+        if let crate::session::parser::SessionEntry::User { message, .. } = entry {
+            !crate::session::parser::is_system_content(&message.content) && !message.is_tool_result
+        } else {
+            false
+        }
+    });
+
+    // Get entries after the last user message
+    let relevant_entries = if let Some(idx) = last_user_index {
+        &entries[idx + 1..]
+    } else {
+        // No user message found, return empty
+        return Vec::new();
+    };
+
     let mut messages = Vec::with_capacity(max_messages);
 
-    for entry in entries.iter().rev() {
+    for entry in relevant_entries.iter().rev() {
         if messages.len() >= max_messages {
             break;
         }

@@ -542,9 +542,10 @@ let renderedAssistantMessages = $derived.by(() => {
 
 	.assistant-messages-container {
 		flex: 1;
-		overflow-y: auto;
+		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+		justify-content: flex-end;
 		gap: var(--space-xs);
 		min-height: 0;
 	}
