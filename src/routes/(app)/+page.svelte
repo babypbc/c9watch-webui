@@ -357,11 +357,11 @@
 					>
 						<SessionCard
 							{session}
-							compact={false}
-							onexpand={() => handleExpand(session)}
+							
+							
 							onstop={() => handleStop(session.pid)}
-							onopen={() => handleOpen(session.pid, session.projectPath)}
-							onrename={() => showRenameHint = true}
+							
+							
 						/>
 					</div>
 				{/each}
@@ -507,7 +507,7 @@
 							</div>
 
 							<div class="status-groups">
-								<div class="status-group" class:empty={group.attention.length === 0} class:compact={isCompact}>
+								<div class="status-group" class:empty={group.attention.length === 0}>
 									<div class="status-header attention">
 										<span class="status-indicator attention"></span>
 										<span class="status-title">Needs Attention</span>
@@ -522,18 +522,18 @@
 											>
 												<SessionCard
 													{session}
-													compact={isCompact}
-													onexpand={() => handleExpand(session)}
+													
+													
 													onstop={() => handleStop(session.pid)}
-													onopen={() => handleOpen(session.pid, session.projectPath)}
-													onrename={() => showRenameHint = true}
+													
+													
 												/>
 											</div>
 										{/each}
 									</div>
 								</div>
 
-								<div class="status-group" class:empty={group.idle.length === 0} class:compact={isCompact}>
+								<div class="status-group" class:empty={group.idle.length === 0}>
 									<div class="status-header idle">
 										<span class="status-indicator idle"></span>
 										<span class="status-title">Idle</span>
@@ -548,18 +548,18 @@
 											>
 												<SessionCard
 													{session}
-													compact={isCompact}
-													onexpand={() => handleExpand(session)}
+													
+													
 													onstop={() => handleStop(session.pid)}
-													onopen={() => handleOpen(session.pid, session.projectPath)}
-													onrename={() => showRenameHint = true}
+													
+													
 												/>
 											</div>
 										{/each}
 									</div>
 								</div>
 
-								<div class="status-group" class:empty={group.working.length === 0} class:compact={isCompact}>
+								<div class="status-group" class:empty={group.working.length === 0}>
 									<div class="status-header working">
 										<span class="status-indicator working"></span>
 										<span class="status-title">Working</span>
@@ -574,11 +574,11 @@
 											>
 												<SessionCard
 													{session}
-													compact={isCompact}
-													onexpand={() => handleExpand(session)}
+													
+													
 													onstop={() => handleStop(session.pid)}
-													onopen={() => handleOpen(session.pid, session.projectPath)}
-													onrename={() => showRenameHint = true}
+													
+													
 												/>
 											</div>
 										{/each}
@@ -597,7 +597,7 @@
 								<span class="project-count">{group.sessions.length}</span>
 							</div>
 
-							<div class="all-sessions-grid" class:compact={isCompact}>
+							<div class="all-sessions-grid" class:>
 								{#each group.sessions as session (session.id)}
 									<div
 										class="card-wrapper"
@@ -606,11 +606,11 @@
 									>
 										<SessionCard
 											{session}
-											compact={isCompact}
-											onexpand={() => handleExpand(session)}
+											
+											
 											onstop={() => handleStop(session.pid)}
-											onopen={() => handleOpen(session.pid, session.projectPath)}
-											onrename={() => showRenameHint = true}
+											
+											
 										/>
 									</div>
 								{/each}

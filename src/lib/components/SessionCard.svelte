@@ -4,14 +4,11 @@
 
 	interface Props {
 		session: Session;
-		compact?: boolean;
 		onexpand?: () => void;
 		onstop?: () => void;
-		onopen?: () => void;
-		onrename?: () => void;
 	}
 
-	let { session, compact = false, onexpand, onstop, onopen, onrename }: Props = $props();
+	let { session, onexpand, onstop }: Props = $props();
 
 	// Extract project directory name from projectPath
 	let projectName = $derived(
@@ -100,10 +97,9 @@
 		return `${diffDays}d`;
 	}
 
-
 	function handleCardClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (target.closest('.action-btn')) {
+		if (target.closest('.close-btn')) {
 			return;
 		}
 		onexpand?.();
@@ -119,20 +115,21 @@
 		}
 	}
 
+	let showConfirm = $state(false);
 
 	function handleStop(e: MouseEvent) {
 		e.stopPropagation();
+		showConfirm = true;
+	}
+
+	function confirmStop() {
+		showConfirm = false;
 		onstop?.();
 	}
 
-	function handleOpen(e: MouseEvent) {
+	function cancelStop(e: MouseEvent) {
 		e.stopPropagation();
-		onopen?.();
-	}
-
-	function handleRenameClick(e: MouseEvent) {
-		e.stopPropagation();
-		onrename?.();
+		showConfirm = false;
 	}
 
 	let idCopied = $state(false);
@@ -151,7 +148,6 @@
 
 <div
 	class="session-card"
-	class:compact
 	class:attention={needsAttention}
 	class:permission={isPermission}
 	class:waiting={isWaitingInput}
@@ -169,6 +165,12 @@
 			<span class="status-label">{getStatusLabel()}</span>
 		</div>
 		<span class="project-name-badge">{projectName}</span>
+		<button type="button" class="close-btn" onclick={handleStop} title="Stop session">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<line x1="18" y1="6" x2="6" y2="18" />
+				<line x1="6" y1="6" x2="18" y2="18" />
+			</svg>
+		</button>
 	</div>
 
 	<!-- Card Content -->
@@ -216,89 +218,58 @@
 			{/if}
 		</div>
 
-
-		{#if !compact}
-			<!-- Info Row: Git (left) + Stats (right) -->
-			<div class="info-row">
-				<!-- Git Info - Left Aligned -->
-				{#if session.gitBranch}
-					<div class="git-info">
-						<div class="git-branch">
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<line x1="6" y1="3" x2="6" y2="15" />
-								<circle cx="18" cy="6" r="3" />
-								<circle cx="6" cy="18" r="3" />
-								<path d="M18 9a9 9 0 0 1-9 9" />
-							</svg>
-							<span class="branch-name">{session.gitBranch}</span>
-						</div>
-						<span class="git-status" class:has-changes={gitStatusInfo && gitStatusInfo.hasChanges}>
-							(+{gitStatusInfo ? gitStatusInfo.added : 0},-{gitStatusInfo ? gitStatusInfo.deleted : 0})
-						</span>
+		<!-- Info Row: Git (left) + Stats (right) -->
+		<div class="info-row">
+			<!-- Git Info - Left Aligned -->
+			{#if session.gitBranch}
+				<div class="git-info">
+					<div class="git-branch">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="6" y1="3" x2="6" y2="15" />
+							<circle cx="18" cy="6" r="3" />
+							<circle cx="6" cy="18" r="3" />
+							<path d="M18 9a9 9 0 0 1-9 9" />
+						</svg>
+						<span class="branch-name">{session.gitBranch}</span>
 					</div>
-				{/if}
-				<!-- Stats - Right Aligned -->
-				<div class="header-stats">
-					<span class="message-count">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-						</svg>
-						{session.messageCount}
-					</span>
-					<span class="time-badge">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<circle cx="12" cy="12" r="10" />
-							<polyline points="12 6 12 12 16 14" />
-						</svg>
-						{formatTimeSince(session.modified)}
+					<span class="git-status" class:has-changes={gitStatusInfo && gitStatusInfo.hasChanges}>
+						(+{gitStatusInfo ? gitStatusInfo.added : 0},-{gitStatusInfo ? gitStatusInfo.deleted : 0})
 					</span>
 				</div>
-			</div>
-
-
-			<!-- Message Preview -->
-			<p class="task-preview">{session.latestMessage || session.firstPrompt}</p>
-
-			<!-- Bottom Actions -->
-			<div class="card-actions-container">
-				<div class="card-actions">
-					<button type="button" class="action-btn" onclick={handleRenameClick} title="Rename">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-						</svg>
-						RENAME
-					</button>
-					<button type="button" class="action-btn danger" onclick={handleStop} title="Stop">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<rect x="6" y="6" width="12" height="12" rx="1" />
-						</svg>
-						STOP
-					</button>
-					<button type="button" class="action-btn primary" onclick={handleOpen} title="Open">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-							<polyline points="15 3 21 3 21 9" />
-							<line x1="10" y1="14" x2="21" y2="3" />
-						</svg>
-						OPEN
-					</button>
-				</div>
-			</div>
-		{:else}
-			<div class="compact-actions">
-				<button type="button" class="action-btn icon-only" onclick={handleOpen} title="Open">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-						<polyline points="15 3 21 3 21 9" />
-						<line x1="10" y1="14" x2="21" y2="3" />
+			{/if}
+			<!-- Stats - Right Aligned -->
+			<div class="header-stats">
+				<span class="message-count">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
 					</svg>
-				</button>
+					{session.messageCount}
+				</span>
+				<span class="time-badge">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<circle cx="12" cy="12" r="10" />
+						<polyline points="12 6 12 12 16 14" />
+					</svg>
+					{formatTimeSince(session.modified)}
+				</span>
 			</div>
-		{/if}
+		</div>
+
+		<!-- Message Preview -->
+		<p class="task-preview">{session.latestMessage || session.firstPrompt}</p>
 	</div>
 
-
+	<!-- Confirmation Dialog -->
+	{#if showConfirm}
+		<div class="confirm-overlay" onclick={cancelStop}></div>
+		<div class="confirm-dialog">
+			<p class="confirm-message">Stop this session?</p>
+			<div class="confirm-actions">
+				<button type="button" class="confirm-btn cancel" onclick={cancelStop}>Cancel</button>
+				<button type="button" class="confirm-btn danger" onclick={confirmStop}>Stop</button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -437,7 +408,6 @@
 		transition: opacity var(--transition-fast), color var(--transition-fast);
 	}
 
-	
 	.copy-id-btn:hover {
 		opacity: 1 !important;
 		color: var(--text-primary);
@@ -448,16 +418,13 @@
 		color: var(--status-input);
 	}
 
-
-	
 	.git-branch {
 		display: flex;
 		align-items: center;
-		gap: 6px; /* 4px * 1.5 = 6px */
+		gap: 6px;
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		color: var(--text-secondary);
-		text-transform: lowercase;
 		min-width: 0;
 	}
 
@@ -470,7 +437,7 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		min-width: 0;
-		max-width: 300px; /* 200px * 1.5 = 300px */
+		max-width: 200px;
 	}
 
 	.git-status {
@@ -485,13 +452,23 @@
 		color: var(--status-permission);
 	}
 
+	.message-count {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-family: var(--font-mono);
+		font-size: 15px;
+		color: var(--text-muted);
+	}
+
 	.time-badge {
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		font-weight: 500;
 		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 	}
 
 	/* Task Preview */
@@ -505,121 +482,6 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		margin: var(--space-xs) 0;
-	}
-
-	.message-count {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-family: var(--font-mono);
-		font-size: 15px;
-		color: var(--text-muted);
-	}
-
-	
-	
-	.card-actions-container {
-		margin-top: auto;
-		display: flex;
-		justify-content: flex-end;
-		padding-top: var(--space-sm);
-	}
-
-	.card-actions {
-		display: flex;
-		gap: var(--space-xs);
-	}
-
-	.action-btn {
-		display: flex;
-		align-items: center;
-		gap: 9px; /* 6px * 1.5 = 9px */
-		padding: 6px 12px; /* 4px 8px * 1.5 = 6px 12px */
-		background: var(--bg-base);
-		border: 1px solid var(--border-default);
-		color: var(--text-muted);
-		font-family: var(--font-mono);
-		font-size: 15px; /* 10px * 1.5 = 15px */
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		transition: all 0.2s ease;
-		cursor: pointer;
-	}
-
-	.action-btn:hover {
-		background: var(--bg-card-hover);
-		color: var(--text-primary);
-		border-color: var(--text-muted);
-	}
-
-	.action-btn.danger:hover {
-		color: var(--status-permission);
-		border-color: var(--status-permission);
-	}
-
-	.action-btn.primary {
-		background: var(--text-primary);
-		color: var(--bg-base);
-		border-color: var(--text-primary);
-	}
-
-	.action-btn.primary:hover {
-		background: var(--text-secondary);
-		border-color: var(--text-secondary);
-	}
-
-	.action-btn svg {
-		flex-shrink: 0;
-	}
-
-	/* Compact Mode Styles */
-	.session-card.compact {
-		height: auto;
-		min-height: auto;
-		padding: var(--space-md);
-		gap: var(--space-md);
-		align-items: center;
-	}
-
-	.session-card.compact .card-body {
-		gap: 4px;
-		justify-content: center;
-		padding-right: 32px;
-	}
-
-	.session-card.compact .card-main-title {
-		font-size: 19.5px; /* 13px * 1.5 = 19.5px */
-		-webkit-line-clamp: 1;
-		line-clamp: 1;
-		margin-bottom: 2px;
-	}
-
-
-	.compact-actions {
-		position: absolute;
-		right: var(--space-md);
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	.compact-actions .action-btn {
-		background: transparent;
-		border-color: transparent;
-	}
-
-	.compact-actions .action-btn:hover {
-		background: var(--bg-elevated);
-		border-color: var(--border-default);
-		color: var(--text-primary);
-	}
-
-	.action-btn.icon-only {
-		padding: 0;
-		width: 28px;
-		height: 28px;
-		justify-content: center;
-		border-radius: 4px;
 	}
 
 	/* Status Header Bar - matches MONITOR page status-header style */
@@ -640,8 +502,26 @@
 		gap: var(--space-sm);
 	}
 
-	
-	
+	.close-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.close-btn:hover {
+		background: var(--status-permission);
+		color: var(--bg-base);
+	}
+
 	.status-header-bar .status-indicator {
 		width: 9px; /* 6px * 1.5 = 9px */
 		height: 9px; /* 6px * 1.5 = 9px */
@@ -685,68 +565,6 @@
 		align-items: center;
 		gap: var(--space-md);
 	}
-
-	.git-branch {
-		display: flex;
-		align-items: center;
-		gap: 6px; /* 4px * 1.5 = 6px */
-		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
-		color: var(--text-secondary);
-		text-transform: lowercase;
-		min-width: 0;
-	}
-
-	.git-branch svg {
-		flex-shrink: 0;
-	}
-
-	.branch-name {
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		min-width: 0;
-		max-width: 200px;
-	}
-
-	.git-status {
-		font-family: var(--font-mono);
-		font-size: 15px;
-		font-weight: 500;
-		color: var(--text-muted);
-		white-space: nowrap;
-	}
-
-	.git-status.has-changes {
-		color: var(--status-permission);
-	}
-
-	.header-stats {
-		display: flex;
-		align-items: center;
-		gap: var(--space-md);
-		margin-left: auto;
-	}
-
-	.message-count {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-family: var(--font-mono);
-		font-size: 15px;
-		color: var(--text-muted);
-	}
-
-	.time-badge {
-		font-family: var(--font-mono);
-		font-size: 15px;
-		font-weight: 500;
-		color: var(--text-muted);
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-	}
-
 
 	/* Status-specific colors for header bar - matches MONITOR page */
 	.session-card.attention .status-header-bar {
@@ -813,6 +631,82 @@
 		50% { opacity: 0.5; }
 	}
 
+	/* Confirmation Dialog */
+	.confirm-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.6);
+		z-index: 9998;
+	}
+
+	.confirm-dialog {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: var(--bg-card);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		padding: var(--space-lg);
+		z-index: 9999;
+		min-width: 300px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+	}
+
+	.confirm-message {
+		font-family: var(--font-sans);
+		font-size: 16px;
+		color: var(--text-primary);
+		margin: 0 0 var(--space-md) 0;
+	}
+
+	.confirm-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: var(--space-sm);
+	}
+
+	.confirm-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 8px 16px;
+		font-family: var(--font-mono);
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.confirm-btn.cancel {
+		background: var(--bg-base);
+		color: var(--text-muted);
+	}
+
+	.confirm-btn.cancel:hover {
+		background: var(--bg-card-hover);
+		color: var(--text-primary);
+		border-color: var(--text-muted);
+	}
+
+	.confirm-btn.danger {
+		background: var(--status-permission);
+		color: var(--bg-base);
+		border-color: var(--status-permission);
+	}
+
+	.confirm-btn.danger:hover {
+		background: var(--status-permission);
+		opacity: 0.9;
+	}
+
 	/* ── Mobile Responsive ─────────────────────────────────────── */
 	@media (max-width: 768px) {
 		.session-card {
@@ -824,7 +718,6 @@
 		.card-main-title {
 			font-size: 13px;
 		}
-
 
 		.branch-name {
 			max-width: 150px;
