@@ -202,7 +202,13 @@
 					</svg>
 					{session.messageCount}
 				</span>
-				<span class="time-badge">{formatTimeSince(session.modified)}</span>
+				<span class="time-badge">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<circle cx="12" cy="12" r="10" />
+						<polyline points="12 6 12 12 16 14" />
+					</svg>
+					{formatTimeSince(session.modified)}
+				</span>
 			</div>
 		</div>
 
@@ -225,11 +231,9 @@
 						</svg>
 						<span class="branch-name">{session.gitBranch}</span>
 					</div>
-					{#if gitStatusInfo}
-						<span class="git-status" class:has-changes={gitStatusInfo.hasChanges}>
-							(+{gitStatusInfo.added}, -{gitStatusInfo.deleted})
-						</span>
-					{/if}
+					<span class="git-status" class:has-changes={gitStatusInfo && gitStatusInfo.hasChanges}>
+						(+{gitStatusInfo ? gitStatusInfo.added : 0}, -{gitStatusInfo ? gitStatusInfo.deleted : 0})
+					</span>
 				</div>
 			{/if}
 
@@ -398,6 +402,8 @@
 		align-items: center;
 		gap: var(--space-sm);
 		flex-wrap: wrap;
+		margin-left: auto;
+		justify-content: flex-end;
 	}
 
 	.git-branch {
