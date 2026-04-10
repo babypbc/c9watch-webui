@@ -560,7 +560,7 @@ let renderedAssistantMessages = $derived.by(() => {
 	}
 
 	.message-row.user .message-icon {
-		margin-top: 2px;
+		margin-top: 4px;
 	}
 
 	.message-row.assistant {
