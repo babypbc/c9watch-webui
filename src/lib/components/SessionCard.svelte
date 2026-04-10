@@ -168,92 +168,93 @@
 			<span class="status-indicator"></span>
 			<span class="status-label">{getStatusLabel()}</span>
 		</div>
-		<div class="header-bar-right">
-			{#if session.contextUsage}
-				<span class="context-usage" title="Context window usage">
-					{formatContextUsage(session.contextUsage)}
-				</span>
-			{/if}
-			<span class="project-name-badge">{projectName}</span>
-		</div>
+		<span class="project-name-badge">{projectName}</span>
 	</div>
 
 	<!-- Card Content -->
 	<div class="card-body">
-		<!-- Header (Summary as Title) -->
-		<div class="card-header">
-			<span class="session-icon">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-				</svg>
-			</span>
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<h3
-				class="card-main-title"
-				onmouseenter={() => tipEnter(session.id)}
-				onmouseleave={tipLeave}
-				onmousemove={tipMove}
-			>
-				{cardTitle}
-			</h3>
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<span
-				class="copy-id-btn"
-				class:copied={idCopied}
-				onclick={copySessionId}
-				onmouseenter={() => tipEnter('Copy session ID')}
-				onmouseleave={tipLeave}
-				onmousemove={tipMove}
-			>
-				{#if idCopied}
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-				{:else}
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-				{/if}
-			</span>
-			<!-- Stats (message count & time) - right aligned -->
-			<div class="header-stats">
-				<span class="message-count">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+		<!-- Header Row: Title (left 50%) + Context Usage (right 50%) -->
+		<div class="card-header-row">
+			<div class="card-header-left">
+				<span class="session-icon">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
 					</svg>
-					{session.messageCount}
 				</span>
-				<span class="time-badge">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="10" />
-						<polyline points="12 6 12 12 16 14" />
-					</svg>
-					{formatTimeSince(session.modified)}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<h3
+					class="card-main-title"
+					onmouseenter={() => tipEnter(session.id)}
+					onmouseleave={tipLeave}
+					onmousemove={tipMove}
+				>
+					{cardTitle}
+				</h3>
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<span
+					class="copy-id-btn"
+					class:copied={idCopied}
+					onclick={copySessionId}
+					onmouseenter={() => tipEnter('Copy session ID')}
+					onmouseleave={tipLeave}
+					onmousemove={tipMove}
+				>
+					{#if idCopied}
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+					{:else}
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+					{/if}
 				</span>
 			</div>
-		</div>
-
-		{#if tooltipText}
-			<div class="id-tooltip" style="left: {tooltipX}px; top: {tooltipY}px;">
-				{tooltipText}
-			</div>
-		{/if}
-
-		{#if !compact}
-			<!-- Git Branch & Status -->
-			{#if session.gitBranch}
-				<div class="git-line">
-					<div class="git-branch">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<line x1="6" y1="3" x2="6" y2="15" />
-							<circle cx="18" cy="6" r="3" />
-							<circle cx="6" cy="18" r="3" />
-							<path d="M18 9a9 9 0 0 1-9 9" />
-						</svg>
-						<span class="branch-name">{session.gitBranch}</span>
-					</div>
-					<span class="git-status" class:has-changes={gitStatusInfo && gitStatusInfo.hasChanges}>
-						(+{gitStatusInfo ? gitStatusInfo.added : 0}, -{gitStatusInfo ? gitStatusInfo.deleted : 0})
-					</span>
+			<!-- Context Usage - Right 50% -->
+			{#if session.contextUsage}
+				<div class="context-usage-mini" title="Context window usage: {formatContextUsage(session.contextUsage)}">
+					<div class="context-progress-mini" style="width: {session.contextUsage.percentage}%"></div>
+					<span class="context-text-mini">{formatContextUsage(session.contextUsage)}</span>
 				</div>
 			{/if}
+		</div>
+
+
+		{#if !compact}
+			<!-- Info Row: Git (left) + Stats (right) -->
+			<div class="info-row">
+				<!-- Git Info - Left Aligned -->
+				{#if session.gitBranch}
+					<div class="git-info">
+						<div class="git-branch">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="6" y1="3" x2="6" y2="15" />
+								<circle cx="18" cy="6" r="3" />
+								<circle cx="6" cy="18" r="3" />
+								<path d="M18 9a9 9 0 0 1-9 9" />
+							</svg>
+							<span class="branch-name">{session.gitBranch}</span>
+						</div>
+						<span class="git-status" class:has-changes={gitStatusInfo && gitStatusInfo.hasChanges}>
+							(+{gitStatusInfo ? gitStatusInfo.added : 0},-{gitStatusInfo ? gitStatusInfo.deleted : 0})
+						</span>
+					</div>
+				{/if}
+				<!-- Stats - Right Aligned -->
+				<div class="header-stats">
+					<span class="message-count">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+						</svg>
+						{session.messageCount}
+					</span>
+					<span class="time-badge">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<circle cx="12" cy="12" r="10" />
+							<polyline points="12 6 12 12 16 14" />
+						</svg>
+						{formatTimeSince(session.modified)}
+					</span>
+				</div>
+			</div>
+
 
 			<!-- Message Preview -->
 			<p class="task-preview">{session.latestMessage || session.firstPrompt}</p>
@@ -332,11 +333,64 @@
 		padding: var(--space-md) var(--space-lg) var(--space-lg);
 	}
 
-	.card-header {
+	/* Header Row: Title (left 50%) + Context Usage (right 50%) */
+	.card-header-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+		width: 100%;
+	}
+
+	.card-header-left {
+		flex: 1;
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
-		flex-wrap: wrap;
+		min-width: 0;
+		max-width: 50%;
+	}
+
+	.card-header-left .card-main-title {
+		font-size: 18px;
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+	}
+
+	/* Context Usage Mini - Right 50% */
+	.context-usage-mini {
+		flex: 1;
+		position: relative;
+		width: 100%;
+		height: 24px;
+		background: var(--bg-base);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+
+	.context-progress-mini {
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		background: linear-gradient(90deg, var(--status-working), var(--status-input));
+		opacity: 0.7;
+		transition: width 0.3s ease;
+	}
+
+	.context-text-mini {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-primary);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+		white-space: nowrap;
+		letter-spacing: 0.05em;
+		z-index: 1;
 	}
 
 	.header-stats {
@@ -383,10 +437,7 @@
 		transition: opacity var(--transition-fast), color var(--transition-fast);
 	}
 
-	.card-header:hover .copy-id-btn {
-		opacity: 0.6;
-	}
-
+	
 	.copy-id-btn:hover {
 		opacity: 1 !important;
 		color: var(--text-primary);
@@ -397,33 +448,8 @@
 		color: var(--status-input);
 	}
 
-	/* Cursor-following tooltip */
-	.id-tooltip {
-		position: fixed;
-		font-family: var(--font-mono);
-		font-size: 16.5px; /* 11px * 1.5 = 16.5px */
-		color: var(--text-primary);
-		background: var(--bg-elevated);
-		border: 1px solid var(--border-default);
-		padding: 6px 12px; /* 4px 8px * 1.5 = 6px 12px */
-		white-space: nowrap;
-		pointer-events: none;
-		z-index: 9999;
-		letter-spacing: 0.02em;
-		text-transform: none;
-		font-weight: 400;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-	}
 
-	.git-line {
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-		flex-wrap: wrap;
-		margin-left: auto;
-		justify-content: flex-end;
-	}
-
+	
 	.git-branch {
 		display: flex;
 		align-items: center;
@@ -493,20 +519,8 @@
 		letter-spacing: 0.05em;
 	}
 
-	/* Card Actions */
-	.stats-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-md);
-	}
-
-	.stats-group {
-		display: flex;
-		align-items: center;
-		gap: var(--space-md);
-	}
-
+	
+	
 	.card-actions-container {
 		margin-top: auto;
 		display: flex;
@@ -584,10 +598,6 @@
 		margin-bottom: 2px;
 	}
 
-	.session-card.compact .stats-row {
-		justify-content: flex-start;
-		gap: var(--space-md);
-	}
 
 	.compact-actions {
 		position: absolute;
@@ -633,21 +643,8 @@
 		gap: var(--space-sm);
 	}
 
-	.header-bar-right {
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-	}
-
-	.context-usage {
-		font-family: var(--font-mono);
-		font-size: 14px;
-		font-weight: 500;
-		color: var(--text-muted);
-		letter-spacing: 0.05em;
-		white-space: nowrap;
-	}
-
+	
+	
 	.status-header-bar .status-indicator {
 		width: 9px; /* 6px * 1.5 = 9px */
 		height: 9px; /* 6px * 1.5 = 9px */
@@ -666,15 +663,97 @@
 
 	.project-name-badge {
 		font-family: var(--font-mono);
-		font-size: 14px;
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-primary);
+		background: var(--bg-card);
+		padding: 4px 10px;
+		border: 1px solid var(--text-muted);
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	/* Info Row - Git (left) + Stats (right) */
+	.info-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-md);
+		margin-top: var(--space-xs);
+	}
+
+	.git-info {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+	}
+
+	.git-branch {
+		display: flex;
+		align-items: center;
+		gap: 6px; /* 4px * 1.5 = 6px */
+		font-family: var(--font-mono);
+		font-size: 18px; /* 12px * 1.5 = 18px */
+		color: var(--text-secondary);
+		text-transform: lowercase;
+		min-width: 0;
+	}
+
+	.git-branch svg {
+		flex-shrink: 0;
+	}
+
+	.branch-name {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		min-width: 0;
+		max-width: 200px;
+	}
+
+	.git-status {
+		font-family: var(--font-mono);
+		font-size: 18px; /* 12px * 1.5 = 18px */
 		font-weight: 500;
 		color: var(--text-muted);
-		background: var(--bg-elevated);
-		padding: 2px 8px;
-		border: 1px solid var(--border-default);
 		letter-spacing: 0.05em;
+		white-space: nowrap;
+	}
+
+	.git-status.has-changes {
+		color: var(--status-permission);
+	}
+
+	.header-stats {
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
 		margin-left: auto;
 	}
+
+	.message-count {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px; /* 4px * 1.5 = 6px */
+		font-family: var(--font-mono);
+		font-size: 18px; /* 12px * 1.5 = 18px */
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.time-badge {
+		font-family: var(--font-mono);
+		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-weight: 500;
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
 
 	/* Status-specific colors for header bar - matches MONITOR page */
 	.session-card.attention .status-header-bar {
@@ -753,10 +832,6 @@
 			font-size: 13px;
 		}
 
-		.stats-row {
-			flex-wrap: wrap;
-			gap: var(--space-xs);
-		}
 
 		.branch-name {
 			max-width: 150px;
