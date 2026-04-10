@@ -499,7 +499,7 @@
 	.status-header-bar-right {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 2px;
 	}
 
 	.status-header-bar-left {
@@ -553,6 +553,7 @@
 		padding: 4px 6px 4px 10px;
 		border: 1px solid var(--text-muted);
 		letter-spacing: 0.05em;
+		text-align: right;
 	}
 
 	/* Info Row - Git (left) + Stats (right) */
