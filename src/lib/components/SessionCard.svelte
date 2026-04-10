@@ -533,7 +533,7 @@ let renderedAssistantMessage = $derived.by(() => {
 	.message-row {
 		display: flex;
 		gap: var(--space-sm);
-		align-items: flex-start;
+		align-items: center;
 		width: 100%;
 		flex-shrink: 0;
 	}
@@ -543,7 +543,6 @@ let renderedAssistantMessage = $derived.by(() => {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-top: 2px;
 	}
 
 	.message-row.user .message-icon {
