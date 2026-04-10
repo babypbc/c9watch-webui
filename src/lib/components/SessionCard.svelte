@@ -542,31 +542,17 @@ let renderedAssistantMessages = $derived.by(() => {
 
 	.assistant-messages-container {
 		flex: 1;
-		overflow: hidden;
+		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		justify-content: flex-end;
 		gap: var(--space-xs);
 		min-height: 0;
-		position: relative;
-	}
-
-	.assistant-messages-container::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 40px;
-		background: linear-gradient(to bottom, var(--bg-card), transparent);
-		pointer-events: none;
 	}
 
 	.message-row {
 		display: flex;
 		gap: var(--space-sm);
 		width: 100%;
-		flex-shrink: 0;
 	}
 
 	.message-row.user {
