@@ -475,10 +475,9 @@
 
 	.git-status {
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		font-weight: 500;
 		color: var(--text-muted);
-		letter-spacing: 0.05em;
 		white-space: nowrap;
 	}
 
@@ -511,12 +510,10 @@
 	.message-count {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px; /* 4px * 1.5 = 6px */
+		gap: 6px;
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 	}
 
 	
@@ -670,7 +667,6 @@
 		padding: 4px 10px;
 		border: 1px solid var(--text-muted);
 		letter-spacing: 0.05em;
-		text-transform: uppercase;
 	}
 
 	/* Info Row - Git (left) + Stats (right) */
@@ -713,10 +709,9 @@
 
 	.git-status {
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		font-weight: 500;
 		color: var(--text-muted);
-		letter-spacing: 0.05em;
 		white-space: nowrap;
 	}
 
@@ -734,21 +729,17 @@
 	.message-count {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px; /* 4px * 1.5 = 6px */
+		gap: 6px;
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 	}
 
 	.time-badge {
 		font-family: var(--font-mono);
-		font-size: 18px; /* 12px * 1.5 = 18px */
+		font-size: 15px;
 		font-weight: 500;
 		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
