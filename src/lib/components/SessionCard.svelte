@@ -341,8 +341,8 @@ let renderedAssistantMessage = $derived.by(() => {
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-sm);
-		padding: var(--space-md) var(--space-lg) var(--space-lg);
+		gap: var(--space-xs);
+		padding: var(--space-sm) var(--space-md) var(--space-md);
 		overflow: hidden;
 	}
 
@@ -350,7 +350,7 @@ let renderedAssistantMessage = $derived.by(() => {
 	.card-header-row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		width: 100%;
 	}
 
@@ -374,7 +374,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		flex: 1;
 		position: relative;
 		width: 100%;
-		height: 24px;
+		height: 20px;
 		background: var(--bg-base);
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-md);
@@ -397,7 +397,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		top: 50%;
 		transform: translate(-50%, -50%);
 		font-family: var(--font-mono);
-		font-size: 13px;
+		font-size: 11px;
 		font-weight: 600;
 		color: var(--text-primary);
 		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -419,11 +419,13 @@ let renderedAssistantMessage = $derived.by(() => {
 		justify-content: center;
 		flex-shrink: 0;
 		color: var(--text-muted);
+		width: 16px;
+		height: 16px;
 	}
 
 	.card-main-title {
 		font-family: var(--font-sans);
-		font-size: 22.5px; /* 15px * 1.5 = 22.5px */
+		font-size: 20px;
 		font-weight: 600;
 		color: var(--text-primary);
 		margin: 0;
@@ -435,6 +437,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		cursor: default;
+		line-height: 1.3;
 	}
 
 	.copy-id-btn {
@@ -442,8 +445,8 @@ let renderedAssistantMessage = $derived.by(() => {
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-		width: 20px;
-		height: 20px;
+		width: 16px;
+		height: 16px;
 		color: var(--text-muted);
 		cursor: pointer;
 		opacity: 0;
@@ -465,7 +468,7 @@ let renderedAssistantMessage = $derived.by(() => {
 		align-items: center;
 		gap: 6px;
 		font-family: var(--font-mono);
-		font-size: 15px;
+		font-size: 13px;
 		color: var(--text-secondary);
 		min-width: 0;
 	}
@@ -484,7 +487,7 @@ let renderedAssistantMessage = $derived.by(() => {
 
 	.git-status {
 		font-family: var(--font-mono);
-		font-size: 15px;
+		font-size: 13px;
 		font-weight: 500;
 		color: var(--text-muted);
 		white-space: nowrap;
@@ -499,13 +502,13 @@ let renderedAssistantMessage = $derived.by(() => {
 		align-items: center;
 		gap: 6px;
 		font-family: var(--font-mono);
-		font-size: 15px;
+		font-size: 13px;
 		color: var(--text-muted);
 	}
 
 	.time-badge {
 		font-family: var(--font-mono);
-		font-size: 15px;
+		font-size: 13px;
 		font-weight: 500;
 		color: var(--text-muted);
 		display: inline-flex;
@@ -531,6 +534,8 @@ let renderedAssistantMessage = $derived.by(() => {
 		display: flex;
 		gap: var(--space-sm);
 		align-items: flex-start;
+		width: 100%;
+		flex-shrink: 0;
 	}
 
 	.message-icon {
@@ -563,13 +568,15 @@ let renderedAssistantMessage = $derived.by(() => {
 		flex: 1;
 		min-width: 0;
 		line-height: 1.7;
+		display: block;
+		width: 100%;
 	}
 
-	.message-content :global(p) {
+	.message-content :global(> *) {
 		margin: 0 0 var(--space-xs) 0;
 	}
 
-	.message-content :global(p:last-child) {
+	.message-content :global(> *:last-child) {
 		margin-bottom: 0;
 	}
 
@@ -624,10 +631,11 @@ let renderedAssistantMessage = $derived.by(() => {
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--space-sm);
-		padding: var(--space-sm) var(--space-md);
+		padding: var(--space-xs) var(--space-md);
 		background: rgba(255, 255, 255, 0.03);
 		border-left: 3px solid var(--border-default);
 		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+		flex-shrink: 0;
 	}
 
 	.status-header-bar-right {
@@ -691,10 +699,10 @@ let renderedAssistantMessage = $derived.by(() => {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		margin-top: 0;
 		padding-top: var(--space-xs);
-		border-top: 1px solid var(--border-default);
+		border-top: 1px solid var(--border-muted);
 	}
 
 	.git-info {
