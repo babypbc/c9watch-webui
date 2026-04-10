@@ -73,10 +73,12 @@ let renderedUserMessage = $derived.by(() => {
 	return DOMPurify.sanitize(rawHtml as string);
 });
 
-let renderedAssistantMessage = $derived.by(() => {
-	if (!session.latestMessage) return '';
-	const rawHtml = marked.parse(session.latestMessage, { async: false, breaks: true, gfm: true });
-	return DOMPurify.sanitize(rawHtml as string);
+let renderedAssistantMessages = $derived.by(() => {
+	const messages = session.recentAssistantMessages || [];
+	return messages.map(msg => {
+		const rawHtml = marked.parse(msg, { async: false, breaks: true, gfm: true });
+		return DOMPurify.sanitize(rawHtml as string);
+	});
 });
 
 	function getStatusLabel(): string {
@@ -284,18 +286,20 @@ let renderedAssistantMessage = $derived.by(() => {
 					<span class="message-content">{@html renderedUserMessage}</span>
 				</div>
 			{/if}
-			{#if renderedAssistantMessage}
-				<div class="message-row assistant">
-					<span class="message-icon">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<rect x="3" y="3" width="18" height="18" rx="2" />
-							<path d="M9 9h6" />
-							<path d="M9 13h6" />
-							<path d="M9 17h6" />
-						</svg>
-					</span>
-					<span class="message-content">{@html renderedAssistantMessage}</span>
-				</div>
+			{#if renderedAssistantMessages.length > 0}
+				{#each renderedAssistantMessages as msg (msg)}
+					<div class="message-row assistant">
+						<span class="message-icon">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="3" y="3" width="18" height="18" rx="2" />
+								<path d="M9 9h6" />
+								<path d="M9 13h6" />
+								<path d="M9 17h6" />
+							</svg>
+						</span>
+						<span class="message-content">{@html msg}</span>
+					</div>
+				{/each}
 			{/if}
 		</div>
 	</div>

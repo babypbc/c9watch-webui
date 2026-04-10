@@ -28,6 +28,8 @@ pub struct Session {
     pub status: SessionStatus,
     pub latest_message: String,
     pub latest_user_message: String,
+    /// Recent assistant messages (last 5 messages, for display in card)
+    pub recent_assistant_messages: Vec<String>,
     pub pending_tool_name: Option<String>,
     /// The input/arguments of the pending tool (when status is NeedsPermission)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -226,6 +228,7 @@ pub fn detect_and_enrich_sessions_with_detector(
 
         let latest_message = get_latest_assistant_message(&entries);
         let latest_user_message = get_latest_user_message(&entries);
+        let recent_assistant_messages = get_recent_assistant_messages(&entries, 5);
         let pending_tool_name = get_pending_tool_name(&entries);
         let pending_tool_input = get_pending_tool_input(&entries);
 
@@ -274,6 +277,7 @@ pub fn detect_and_enrich_sessions_with_detector(
             status,
             latest_message: latest_message,
             latest_user_message: latest_user_message,
+            recent_assistant_messages,
             pending_tool_name,
             pending_tool_input,
             context_usage,
@@ -559,6 +563,79 @@ pub fn get_latest_assistant_message(
     }
 
     String::new()
+}
+
+/// Extract recent assistant messages (up to 5 messages) for display
+pub fn get_recent_assistant_messages(
+    entries: &[crate::session::parser::SessionEntry],
+    max_messages: usize,
+) -> Vec<String> {
+    let mut messages = Vec::with_capacity(max_messages);
+
+    for entry in entries.iter().rev() {
+        if messages.len() >= max_messages {
+            break;
+        }
+
+        if let crate::session::parser::SessionEntry::Assistant { message, .. } = entry {
+            for content in message.content.iter().rev() {
+                match content {
+                    crate::session::parser::MessageContent::Text { text } => {
+                        if !text.trim().is_empty() {
+                            messages.push(truncate_string(text, 300));
+                            break;
+                        }
+                    }
+                    crate::session::parser::MessageContent::Thinking { thinking, .. } => {
+                        if !thinking.trim().is_empty() {
+                            messages.push(truncate_string(thinking, 300));
+                            break;
+                        }
+                    }
+                    crate::session::parser::MessageContent::ToolUse { name, input, .. } => {
+                        let tool_desc = format_tool_description(name, input);
+                        if !tool_desc.is_empty() {
+                            messages.push(tool_desc);
+                            break;
+                        }
+                    }
+                    _ => continue,
+                }
+            }
+        }
+    }
+
+    // Reverse to get chronological order (oldest first, newest last)
+    messages.reverse();
+    messages
+}
+
+fn format_tool_description(name: &str, input: &serde_json::Value) -> String {
+    // Extract key information from tool input for display
+    match name {
+        "Bash" => {
+            if let Some(cmd) = input.get("command").and_then(|v| v.as_str()) {
+                return format!("Bash: {}", truncate_string(cmd, 50));
+            }
+        }
+        "Read" => {
+            if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                return format!("Read: {}", truncate_string(path, 50));
+            }
+        }
+        "Edit" => {
+            if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                return format!("Edit: {}", truncate_string(path, 50));
+            }
+        }
+        "Write" => {
+            if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                return format!("Write: {}", truncate_string(path, 50));
+            }
+        }
+        _ => {}
+    }
+    format!("Executing {}...", name)
 }
 
 /// Count user/assistant messages in a JSONL file.

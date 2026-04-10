@@ -58,6 +58,9 @@ export interface Session {
   /** Content of the latest user message */
   latestUserMessage: string;
 
+  /** Recent assistant messages (last 5 messages, for display in card) */
+  recentAssistantMessages?: string[];
+
   /** Name of the tool or reason awaiting attention (if status is NeedsAttention) */
   pendingToolName: string | null;
 
