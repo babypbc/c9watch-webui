@@ -527,11 +527,24 @@ let renderedAssistantMessages = $derived.by(() => {
 		margin-top: var(--space-xs);
 		margin-bottom: 0;
 		flex: 1;
-		overflow-y: auto;
+		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+		justify-content: flex-end;
 		gap: var(--space-xs);
 		min-height: 0;
+		position: relative;
+	}
+
+	.task-preview::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 40px;
+		background: linear-gradient(to bottom, var(--bg-card), transparent);
+		pointer-events: none;
 	}
 
 	.message-row {
