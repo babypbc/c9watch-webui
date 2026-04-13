@@ -215,15 +215,7 @@ pub fn detect_and_enrich_sessions_with_detector(
         let status = if entries.is_empty() {
             SessionStatus::Connecting
         } else {
-            let raw_status = determine_status(&entries);
-            // Override WaitingForInput if the JSONL file was recently modified.
-            if raw_status == SessionStatus::WaitingForInput
-                && is_file_recently_modified(&session_file_path, 8)
-            {
-                SessionStatus::Working
-            } else {
-                raw_status
-            }
+            determine_status(&entries)
         };
 
         let latest_message = get_latest_assistant_message(&entries);
