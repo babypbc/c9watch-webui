@@ -145,10 +145,9 @@ export const wsClient = new WsClient();
 
 // ── Transport helpers ────────────────────────────────────────────────
 
-/** Check if running inside Tauri desktop (not just bundled JS with the property) */
+/** Check if running inside Tauri desktop */
 export function isTauri(): boolean {
-	return typeof window !== 'undefined' &&
-		typeof (window as any).__TAURI_INTERNALS__?.invoke === 'function';
+	return !!(globalThis as any).isTauri;
 }
 
 /** Get stored WS URL (set by QR code scan on mobile) */
